@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WATJ-DB - Your Ultimate Relaxation Destination</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">WATJ-DB</div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#live">Listen Live</a></li>
+                <li><a href="#schedule">Schedule</a></li>
+                <li><a href="#advertise">Advertise</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Your Ultimate Relaxation Destination</h1>
+                <p>Experience the finest selection of smooth jazz, curated just for you</p>
+                <div class="player-container main-player">
+                    <div class="now-playing">
+                        <img src="assets/album-cover.jpg" alt="Now Playing" class="album-art">
+                        <div class="track-info">
+                            <h3>Main Station - WATJ-DB</h3>
+                            <p class="track-title">Loading...</p>
+                            <p class="artist">WATJ-DB</p>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button class="play-btn" data-station="main"><i class="fas fa-play"></i></button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" min="0" max="100" value="80">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="schedule" class="schedule">
+        <div class="container">
+            <h2>Today's Playlist</h2>
+            <div class="schedule-grid">
+                <!-- Schedule items will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <section id="stations" class="stations">
+        <div class="container">
+            <h2>Our Radio Stations</h2>
+            <div class="stations-grid">
+                <div class="station-card" data-station="station1">
+                    <div class="station-info">
+                        <h3>Islands In The Sun</h3>
+                        <p>John Klemmer</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station2">
+                    <div class="station-info">
+                        <h3>Beverly Hills Party</h3>
+                        <p>Peet Project</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station3">
+                    <div class="station-info">
+                        <h3>Newport Nights</h3>
+                        <p>Michael Cates</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station4">
+                    <div class="station-info">
+                        <h3>Out 2Night</h3>
+                        <p>Marcus Anderson</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station5">
+                    <div class="station-info">
+                        <h3>Reach into My Heart</h3>
+                        <p>Lori Nicely</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station6">
+                    <div class="station-info">
+                        <h3>Tasting Sunshine</h3>
+                        <p>Kimberly Brewer</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station7">
+                    <div class="station-info">
+                        <h3>Jazz Lounge</h3>
+                        <p>Smooth Jazz</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station8">
+                    <div class="station-info">
+                        <h3>Late Night Jazz</h3>
+                        <p>Midnight Session</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station9">
+                    <div class="station-info">
+                        <h3>Jazz Cafe</h3>
+                        <p>Coffee & Jazz</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+                <div class="station-card" data-station="station10">
+                    <div class="station-info">
+                        <h3>Classic Jazz</h3>
+                        <p>The Classics</p>
+                    </div>
+                    <button class="play-btn"><i class="fas fa-play"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="advertise" class="advertise">
+        <div class="container">
+            <h2>Advertise With Us</h2>
+            <div class="ad-options">
+                <div class="ad-card">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h3>On-Air Advertising</h3>
+                    <p>Reach our dedicated listeners through radio spots</p>
+                    <a href="#contact" class="btn">Learn More</a>
+                </div>
+                <div class="ad-card">
+                    <i class="fas fa-globe"></i>
+                    <h3>Digital Presence</h3>
+                    <p>Expand your reach through our website and social media</p>
+                    <a href="#contact" class="btn">Learn More</a>
+                </div>
+                <div class="ad-card">
+                    <i class="fas fa-handshake"></i>
+                    <h3>Event Sponsorship</h3>
+                    <p>Partner with us for special events and broadcasts</p>
+                    <a href="#contact" class="btn">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Get in Touch</h2>
+            <div class="contact-wrapper">
+                <form id="contact-form" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" required>
+                        <label for="name">Full Name</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" required>
+                        <label for="email">Email Address</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" required></textarea>
+                        <label for="message">Your Message</label>
+                    </div>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+                <div class="contact-info">
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <p>+1 (973) 936-9092</p>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <p>contact@watj-db.com</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About WATJ-DB</h3>
+                    <p>Your smooth jazz sanctuary, bringing you the finest selection of relaxing music 24/7.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#schedule">Schedule</a></li>
+                        <li><a href="#advertise">Advertise</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect With Us</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 WATJ-DB. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
