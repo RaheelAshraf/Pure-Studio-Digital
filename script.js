@@ -41,57 +41,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mobile Menu Toggle
+    // Mobile Menu Toggle - Optimized
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
+    const body = document.body;
+    let isMenuOpen = false;
 
     if (mobileMenuBtn && navLinks) {
-        // Toggle menu when hamburger is clicked
-        mobileMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        const toggleMenu = () => {
+            isMenuOpen = !isMenuOpen;
             navLinks.classList.toggle('active');
-            document.body.classList.toggle('menu-open');
+            body.style.overflow = isMenuOpen ? 'hidden' : '';
             mobileMenuBtn.querySelector('i').classList.toggle('fa-bars');
             mobileMenuBtn.querySelector('i').classList.toggle('fa-times');
+        };
+
+        // Use touchstart for better mobile response
+        mobileMenuBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleMenu();
+        }, { passive: false });
+
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMenu();
         });
 
-        // Close menu when clicking a nav link
+        // Optimize touch scrolling in menu
+        let touchStartY = 0;
+        navLinks.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        navLinks.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const scrollTop = navLinks.scrollTop;
+            const scrollHeight = navLinks.scrollHeight;
+            const clientHeight = navLinks.clientHeight;
+
+            // Prevent overscroll only when needed
+            if ((scrollTop <= 0 && touchY > touchStartY) || 
+                (scrollTop + clientHeight >= scrollHeight && touchY < touchStartY)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Optimize click handlers
+        const closeMenu = () => {
+            if (isMenuOpen) {
+                isMenuOpen = false;
+                navLinks.classList.remove('active');
+                body.style.overflow = '';
+                mobileMenuBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            }
+        };
+
         navLinks.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                document.body.classList.remove('menu-open');
-                mobileMenuBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
-            });
+            link.addEventListener('click', closeMenu, { passive: true });
         });
 
-        // Close menu when clicking outside
+        // Use event delegation for outside clicks
         document.addEventListener('click', (e) => {
-            if (!navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                navLinks.classList.remove('active');
-                document.body.classList.remove('menu-open');
-                mobileMenuBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            if (isMenuOpen && !navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                closeMenu();
             }
-        });
-    }
-
-    // Mobile Navigation Setup
-    const navToggle = document.querySelector('.nav-toggle');
-
-    if (navToggle && navLinks) {
-        navToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            document.body.classList.toggle('nav-open');
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (navLinks.classList.contains('active') && 
-                !navToggle.contains(e.target) && 
-                !navLinks.contains(e.target)) {
-                navLinks.classList.remove('active');
-                document.body.classList.remove('nav-open');
-            }
-        });
+        }, { passive: true });
     }
 
     // Populate schedule (if needed)
@@ -129,42 +143,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Smooth scroll for navigation links
+    // Optimize smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const href = this.getAttribute('href');
-            
-            // Skip if href is just "#"
             if (href === '#') return;
             
             const target = document.querySelector(href);
             if (target) {
+                // Use requestAnimationFrame for smoother scrolling
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 80;
                 window.scrollTo({
-                    top: target.offsetTop - 80, // Offset for header
-                    behavior: 'smooth',
-                    duration: 500
+                    top: targetPosition,
+                    behavior: 'smooth'
                 });
             }
-        });
+        }, { passive: false });
     });
 
-    // Add scroll animation for elements
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
+    // Optimize intersection observer
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('in-view');
+                requestAnimationFrame(() => {
+                    entry.target.classList.add('in-view');
+                });
             }
         });
-    }, observerOptions);
-
-    // Observe all sections
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     });
+
+    // Batch observe operations
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => observer.observe(section));
 });
