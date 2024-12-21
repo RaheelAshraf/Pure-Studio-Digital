@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
 
     // Audio Player Controls
-    const audioPlayer = document.querySelector('.audio-player');
+    const audio = new Audio('https://stream4.rcast.net/72127');
     const playButtons = document.querySelectorAll('.play-button');
     let activeButton = null;
-    let currentAudio = null;
+
+    // Set audio properties
+    audio.preload = 'none';
 
     playButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -24,10 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeButton === button) {
                 // If clicking the same button that's currently playing
                 if (icon) icon.className = 'fas fa-play';
+                audio.pause();
                 activeButton = null;
             } else {
                 // If clicking a new button or starting playback
                 if (icon) icon.className = 'fas fa-pause';
+                audio.play().catch(e => {
+                    console.error('Error playing audio:', e);
+                    // Reset button state if playback fails
+                    if (icon) icon.className = 'fas fa-play';
+                });
                 activeButton = button;
             }
         });
