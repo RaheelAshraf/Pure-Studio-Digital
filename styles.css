@@ -396,7 +396,7 @@
 }
 
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto !important; /* Disable smooth scroll */
 }
 
 body {
@@ -404,6 +404,10 @@ body {
     background-color: #1E1B2E;
     color: white;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
 .container {
@@ -418,9 +422,8 @@ body {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(26, 23, 37, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgb(26, 23, 37);
+    contain: layout style paint;
 }
 
 .navbar {
@@ -480,6 +483,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Base nav styles */
 .nav-links {
     display: flex;
     gap: 40px;
@@ -580,7 +584,7 @@ body {
 }
 
 .play-button {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
@@ -606,6 +610,14 @@ body {
 
 .play-button i {
     font-size: 1.2rem;
+}
+
+.play-button.playing {
+    background: #e74c3c;
+}
+
+.play-button.playing:hover {
+    background: #c0392b;
 }
 
 .now-playing-card {
@@ -857,6 +869,14 @@ body {
 
 .play-button i {
     font-size: 1.2rem;
+}
+
+.play-button.playing {
+    background: #e74c3c;
+}
+
+.play-button.playing:hover {
+    background: #c0392b;
 }
 
 .now-playing-card {
@@ -2341,6 +2361,7 @@ body {
         display: flex;
     }
 
+    /* Optimize animations */
     .nav-link {
         padding: 15px 0;
         width: 100%;
@@ -2351,7 +2372,7 @@ body {
         backface-visibility: hidden;
     }
 
-    /* Optimize the header for better performance */
+    /* Optimize fixed header */
     .header {
         position: fixed;
         width: 100%;
@@ -2361,11 +2382,6 @@ body {
         transform: translateZ(0);
         will-change: transform;
         backface-visibility: hidden;
-    }
-
-    /* Adjust body padding when menu is open */
-    body.menu-open {
-        overflow: hidden;
     }
 }
 
@@ -2537,69 +2553,6 @@ body {
     filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
 }
 
-/* Add these styles for the mobile menu button */
-.mobile-menu-btn {
-    display: none; /* Hide by default on desktop */
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 8px;
-    font-size: 1.2rem;
-}
-
-/* Update the media query to show the mobile menu button */
-@media (max-width: 992px) {
-    .nav-links {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(26, 23, 37, 0.98);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 80px 20px 20px;
-        flex-direction: column;
-        gap: 30px;
-        z-index: 999;
-        align-items: center;
-        text-align: center;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        transform: translateZ(0);
-    }
-
-    .nav-links.active {
-        display: flex;
-    }
-
-    /* Optimize animations */
-    .nav-link {
-        padding: 15px 0;
-        width: 100%;
-        justify-content: center;
-        font-size: 1.2rem;
-        transform: translateZ(0);
-        will-change: transform;
-        backface-visibility: hidden;
-    }
-
-    /* Optimize fixed header */
-    .header {
-        position: fixed;
-        width: 100%;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        transform: translateZ(0);
-        will-change: transform;
-        backface-visibility: hidden;
-    }
-}
-
 /* Prevent image selection and blue highlight */
 img {
     -webkit-user-select: none;
@@ -2636,4 +2589,267 @@ button:focus-visible {
 .track-cover img,
 .featured-cover img {
     pointer-events: none;
+}
+
+/* Add these performance optimizations */
+* {
+    /* Optimize paint operations */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Optimize fixed elements */
+.header {
+    /* Force GPU acceleration for fixed header */
+    position: fixed;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Reduce paint areas for animations */
+.nav-links {
+    /* Optimize mobile menu */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    contain: content;
+}
+
+/* Optimize scrolling performance */
+body {
+    overflow-y: scroll; /* Always show scrollbar to prevent layout shifts */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none; /* Prevent bounce effects */
+}
+
+/* Reduce repaints for gradient elements */
+[class*="gradient"],
+[style*="gradient"] {
+    contain: paint;
+}
+
+/* Optimize images */
+img {
+    content-visibility: auto;
+    contain: paint;
+}
+
+/* Remove unnecessary animations and transforms */
+* {
+    /* Reset performance-heavy properties */
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    will-change: auto !important;
+    transform: none !important;
+}
+
+/* Optimize fixed header only */
+.header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Simplify transitions */
+.nav-link,
+.play-button,
+.station-card,
+.footer-social a,
+.now-playing-card {
+    transition: none; /* Remove transitions temporarily */
+}
+
+/* Optimize background images */
+.hero {
+    background-attachment: scroll !important; /* Remove fixed background */
+}
+
+/* Remove heavy blur effects */
+@media (max-width: 992px) {
+    .nav-links {
+        background: rgb(26, 23, 37);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+
+/* Optimize gradients */
+[class*="gradient"],
+[style*="gradient"] {
+    background: #1a1725 !important; /* Replace gradients with solid colors */
+}
+
+/* Remove heavy box-shadows */
+.play-button,
+.station-card,
+.now-playing-card {
+    box-shadow: none !important;
+}
+
+/* Disable animations on mobile */
+@media (max-width: 768px) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Optimize during scroll */
+body.is-scrolling * {
+    pointer-events: none !important;
+}
+
+/* Remove all transitions during scroll */
+body.is-scrolling {
+    pointer-events: none;
+}
+
+body.is-scrolling .header {
+    pointer-events: auto;
+}
+
+/* Optimize fixed header */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgb(26, 23, 37);
+    contain: layout style paint;
+}
+
+/* Optimize sections */
+section {
+    contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+}
+
+/* Remove all animations and transitions */
+*, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Optimize images */
+img {
+    content-visibility: auto;
+    contain: strict;
+    width: auto;
+    height: auto;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .nav-links {
+        background: rgb(26, 23, 37);
+        contain: strict;
+    }
+
+    .hero {
+        background-attachment: initial;
+        background-image: none;
+        background-color: rgb(26, 23, 37);
+    }
+
+    [class*="gradient"] {
+        background: rgb(26, 23, 37) !important;
+    }
+}
+
+/* Add image loading optimizations */
+img {
+    /* Prevent layout shift */
+    aspect-ratio: attr(width) / attr(height);
+    
+    /* Optimize memory usage */
+    content-visibility: auto;
+    
+    /* Prevent blurry images */
+    image-rendering: -webkit-optimize-contrast;
+    
+    /* Add loading animation */
+    @keyframes imageLoad {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    &[loading] {
+        opacity: 0;
+    }
+    
+    &.loaded {
+        animation: imageLoad 0.3s ease-in;
+    }
+}
+
+/* Add loading placeholder */
+.image-wrapper {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+        );
+        animation: loading 1.5s infinite;
+    }
+}
+
+@keyframes loading {
+    to {
+        left: 100%;
+    }
+}
+
+/* Image loading styles */
+.lazy {
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+.lazy.loaded {
+    opacity: 1;
+}
+
+.image-wrapper {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.image-wrapper::before {
+    content: '';
+    display: block;
+    padding-top: 75%; /* 4:3 aspect ratio */
+}
+
+.image-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
