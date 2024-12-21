@@ -591,84 +591,144 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 20px rgba(255, 45, 85, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .play-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(255, 45, 85, 0.2);
+    box-shadow: 0 15px 30px rgba(255, 45, 85, 0.4);
 }
 
-.mobile-menu-btn {
-    display: none;
-    background: none;
-    border: none;
+.play-button i {
+    font-size: 1.2rem;
+}
+
+.now-playing-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 0 30px rgba(255, 45, 85, 0.1);
+}
+
+.now-playing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.25),
+        0 0 40px rgba(255, 45, 85, 0.15);
+}
+
+.album-cover {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.now-playing-card:hover .album-cover img {
+    transform: scale(1.1);
+}
+
+.track-info {
+    text-align: left;
+}
+
+.track-name {
+    font-size: 1.2rem;
+    font-weight: 600;
     color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 5px;
+    margin-bottom: 5px;
+    line-height: 1.4;
 }
 
-@media (max-width: 1200px) {
-    .nav-links {
-        gap: 30px;
-    }
-
-    .now-playing-mini {
-        display: none;
-    }
+.artist-name {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
 }
 
-@media (max-width: 992px) {
-    .navbar {
-        padding: 12px 0;
+.track-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.meta-item i {
+    color: #FF2D55;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 0 15px;
+        text-align: center;
     }
 
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: rgba(26, 23, 37, 0.98);
-        padding: 20px;
+    .hero-cta {
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
         gap: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .nav-links.active {
-        display: flex;
-    }
-
-    .mobile-menu-btn {
-        display: block;
-        order: 1;
     }
 
     .play-button {
-        margin-left: auto;
-    }
-
-    .logo-freq {
-        display: none;
+        width: auto;
+        min-width: 200px;
+        max-width: 240px;
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
     }
 }
 
 @media (max-width: 480px) {
-    .logo-text, .logo-sub {
-        font-size: 1.5rem;
-    }
-
-    .play-button span {
-        display: none;
-    }
-
     .play-button {
-        padding: 10px;
-        aspect-ratio: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        min-width: 180px;
+        max-width: 220px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    body {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .container {
+        overflow-x: hidden;
     }
 }
 
@@ -1213,10 +1273,10 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
 }
 
 .tune-in-btn i {

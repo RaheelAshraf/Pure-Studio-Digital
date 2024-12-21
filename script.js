@@ -124,7 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const target = document.querySelector(href);
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+                window.scrollTo({
+                    top: target.offsetTop - 80, // Offset for header
+                    behavior: 'smooth',
+                    duration: 500
+                });
             }
         });
     });
