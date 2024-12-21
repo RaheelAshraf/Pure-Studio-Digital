@@ -1,205 +1,137 @@
-// Navigation Toggle
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded');
 
-navToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    document.body.classList.toggle('nav-open');
-});
+    // Audio Player Controls
+    const audioPlayer = document.querySelector('.audio-player');
+    const playButtons = document.querySelectorAll('.play-button');
+    let activeButton = null;
+    let currentAudio = null;
 
-// Close mobile menu when clicking outside
-document.addEventListener('click', (e) => {
-    if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-        navLinks.classList.remove('active');
-        document.body.classList.remove('nav-open');
-    }
-});
+    playButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('Play button clicked');
+            
+            // If a different button was active, reset its icon
+            if (activeButton && activeButton !== button) {
+                const prevIcon = activeButton.querySelector('i');
+                if (prevIcon) {
+                    prevIcon.className = 'fas fa-play';
+                }
+            }
 
-// Radio Stations Player
-class RadioPlayer {
-    constructor() {
-        this.stations = new Map();
-        this.currentStation = null;
-        this.streamUrl = 'https://paul-derbeat-sd-radio.triggerfm.de';
-        this.volumeControl = document.querySelector('.volume-control input');
-        this.setupStations();
-        this.setupEventListeners();
-    }
-
-    setupStations() {
-        // Main station
-        const mainStation = {
-            audio: new Audio(this.streamUrl),
-            button: document.querySelector('.main-player .play-btn'),
-            card: document.querySelector('.main-player'),
-            name: 'main'
-        };
-        this.stations.set('main', mainStation);
-
-        // Additional stations
-        document.querySelectorAll('.station-card').forEach(card => {
-            const stationId = card.dataset.station;
-            const station = {
-                audio: new Audio(this.streamUrl),
-                button: card.querySelector('.play-btn'),
-                card: card,
-                name: stationId
-            };
-            this.stations.set(stationId, station);
+            const icon = button.querySelector('i');
+            if (activeButton === button) {
+                // If clicking the same button that's currently playing
+                if (icon) icon.className = 'fas fa-play';
+                activeButton = null;
+            } else {
+                // If clicking a new button or starting playback
+                if (icon) icon.className = 'fas fa-pause';
+                activeButton = button;
+            }
         });
-    }
-
-    setupEventListeners() {
-        this.volumeControl.addEventListener('input', () => {
-            const volume = this.volumeControl.value / 100;
-            this.stations.forEach(station => {
-                station.audio.volume = volume;
-            });
-        });
-
-        this.stations.forEach(station => {
-            station.button.addEventListener('click', () => {
-                this.toggleStation(station.name);
-            });
-
-            station.audio.addEventListener('play', () => {
-                this.updateStationUI(station.name, true);
-            });
-
-            station.audio.addEventListener('pause', () => {
-                this.updateStationUI(station.name, false);
-            });
-
-            station.audio.addEventListener('error', (e) => {
-                console.error(`Error playing station ${station.name}:`, e);
-                this.updateStationUI(station.name, false);
-            });
-        });
-    }
-
-    toggleStation(stationId) {
-        const station = this.stations.get(stationId);
-        
-        if (this.currentStation && this.currentStation !== stationId) {
-            // Stop current station
-            const currentStation = this.stations.get(this.currentStation);
-            currentStation.audio.pause();
-            this.updateStationUI(this.currentStation, false);
-        }
-
-        if (station.audio.paused) {
-            // Play new station
-            station.audio.play().catch(error => {
-                console.error('Error playing audio:', error);
-            });
-            this.currentStation = stationId;
-        } else {
-            // Pause current station
-            station.audio.pause();
-            this.currentStation = null;
-        }
-    }
-
-    updateStationUI(stationId, isPlaying) {
-        const station = this.stations.get(stationId);
-        const icon = station.button.querySelector('i');
-        
-        if (isPlaying) {
-            icon.className = 'fas fa-pause';
-            station.card.classList.add('playing');
-        } else {
-            icon.className = 'fas fa-play';
-            station.card.classList.remove('playing');
-        }
-    }
-}
-
-// Initialize radio player
-const radioPlayer = new RadioPlayer();
-
-// Sample playlist data
-const playlist = [
-    { time: '12:00 AM', title: 'Late Night Jazz', artist: 'Various Artists' },
-    { time: '2:00 AM', title: 'Smooth Saxophone', artist: 'John Coltrane' },
-    { time: '4:00 AM', title: 'Morning Melodies', artist: 'Miles Davis' },
-    { time: '6:00 AM', title: 'Jazz at Sunrise', artist: 'Duke Ellington' },
-    { time: '8:00 AM', title: 'Coffee & Jazz', artist: 'Ella Fitzgerald' },
-    { time: '10:00 AM', title: 'Jazz Standards', artist: 'Louis Armstrong' }
-];
-
-// Populate schedule
-const scheduleGrid = document.querySelector('.schedule-grid');
-
-function populateSchedule() {
-    playlist.forEach(item => {
-        const scheduleItem = document.createElement('div');
-        scheduleItem.className = 'schedule-item';
-        scheduleItem.innerHTML = `
-            <div class="time">${item.time}</div>
-            <div class="program">
-                <h3>${item.title}</h3>
-                <p>${item.artist}</p>
-            </div>
-        `;
-        scheduleGrid.appendChild(scheduleItem);
     });
-}
 
-populateSchedule();
+    // Mobile Menu
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
 
-// Contact Form
-const contactForm = document.getElementById('contact-form');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    }
 
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Get form data
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        message: document.getElementById('message').value
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-links') && !e.target.closest('.mobile-menu-btn')) {
+            navLinks.classList.remove('active');
+        }
+    });
+
+    // Mobile Navigation Setup
+    const navToggle = document.querySelector('.nav-toggle');
+
+    if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            document.body.classList.toggle('nav-open');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && 
+                !navToggle.contains(e.target) && 
+                !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                document.body.classList.remove('nav-open');
+            }
+        });
+    }
+
+    // Populate schedule (if needed)
+    const scheduleGrid = document.querySelector('.schedule-grid');
+    if (scheduleGrid && window.playlist) {
+        function populateSchedule() {
+            window.playlist.forEach(item => {
+                const scheduleItem = document.createElement('div');
+                scheduleItem.className = 'schedule-item';
+                scheduleItem.innerHTML = `
+                    <div class="time">${item.time}</div>
+                    <div class="program">
+                        <h3>${item.show}</h3>
+                        <p>${item.artist}</p>
+                    </div>
+                `;
+                scheduleGrid.appendChild(scheduleItem);
+            });
+        }
+        populateSchedule();
+    }
+
+    // Contact form handling
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            console.log('Form submitted:', {
+                name: document.getElementById('name')?.value,
+                email: document.getElementById('email')?.value,
+                message: document.getElementById('message')?.value
+            });
+            alert('Thank you for your message! We will get back to you soon.');
+            contactForm.reset();
+        });
+    }
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Add scroll animation for elements
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     };
 
-    // Here you would typically send the form data to your server
-    console.log('Form submitted:', formData);
-    
-    // Show success message
-    alert('Thank you for your message! We will get back to you soon.');
-    contactForm.reset();
-});
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, observerOptions);
 
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-            // Close mobile menu if open
-            navLinks.classList.remove('active');
-            document.body.classList.remove('nav-open');
-        }
+    // Observe all sections
+    document.querySelectorAll('section').forEach(section => {
+        observer.observe(section);
     });
-});
-
-// Add scroll animation for elements
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-        }
-    });
-}, observerOptions);
-
-// Observe all sections
-document.querySelectorAll('section').forEach(section => {
-    observer.observe(section);
 });
