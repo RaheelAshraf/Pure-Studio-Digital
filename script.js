@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             const href = link.getAttribute('href');
             
+            // Skip if href is empty or just "#"
+            if (!href || href === '#') return;
+            
             // Handle special cases
             if (href === '/') {
                 e.preventDefault();
@@ -28,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Handle anchor links
-            if (href.startsWith('#')) {
+            if (href.startsWith('#') && href.length > 1) {
                 e.preventDefault();
                 const targetElement = document.querySelector(href);
                 if (targetElement) {
@@ -49,36 +52,71 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let activeAudio = null;
+    let audioStreams = new Map();
     let isPlaying = false;
     let activeButton = null;
-    const audioStreams = new Map();
-    
-    // Pre-initialize the main stream immediately
-    const mainStreamUrl = 'http://live3.rcast.net:9150/;stream';
-    const mainAudio = new Audio();
-    mainAudio.preload = "auto";
-    mainAudio.crossOrigin = "anonymous";
-    mainAudio.src = mainStreamUrl;
-    
-    // Optimize initial loading
-    mainAudio.load();
-    audioStreams.set(mainStreamUrl, mainAudio);
 
-    // Initialize other streams with delay
-    setTimeout(() => {
-        const streamButtons = document.querySelectorAll('[data-stream]');
-        streamButtons.forEach(button => {
+    // Pre-initialize audio streams
+    function initializeStreams() {
+        document.querySelectorAll('[data-stream]').forEach(button => {
             const streamUrl = button.dataset.stream;
-            if (streamUrl && streamUrl !== mainStreamUrl && !audioStreams.has(streamUrl)) {
-                const audio = new Audio();
-                audio.preload = "auto";
-                audio.crossOrigin = "anonymous";
-                audio.src = streamUrl;
-                audioStreams.set(streamUrl, audio);
-            }
-        });
-    }, 2000); // Delay other streams initialization
+            if (!streamUrl || audioStreams.has(streamUrl)) return;
 
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.crossOrigin = "anonymous";
+            audio.src = streamUrl;
+            
+            // Set initial volume
+            const volumeControl = document.querySelector('.volume input[type="range"]');
+            if (volumeControl) {
+                audio.volume = volumeControl.value / 100;
+            }
+
+            audioStreams.set(streamUrl, audio);
+        });
+    }
+
+    // Initialize all streams immediately
+    initializeStreams();
+
+    function playStream(button) {
+        const streamUrl = button.dataset.stream;
+        if (!streamUrl) return;
+
+        const newAudio = audioStreams.get(streamUrl);
+        if (!newAudio) return;
+
+        // If same stream is clicked, toggle play/pause
+        if (activeButton === button) {
+            if (isPlaying) {
+                newAudio.pause();
+                isPlaying = false;
+            } else {
+                newAudio.play().catch(() => {});
+                isPlaying = true;
+            }
+            toggleIcon(button, isPlaying);
+            return;
+        }
+
+        // Switch to new stream
+        if (activeAudio) {
+            activeAudio.pause();
+            if (activeButton) {
+                toggleIcon(activeButton, false);
+            }
+        }
+
+        // Play new stream immediately
+        newAudio.play().catch(() => {});
+        activeAudio = newAudio;
+        activeButton = button;
+        isPlaying = true;
+        toggleIcon(button, true);
+    }
+
+    // Toggle play/pause icon
     function toggleIcon(button, playing) {
         const icon = button.querySelector('i');
         if (icon) {
@@ -87,100 +125,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function stopCurrentAudio() {
-        if (activeAudio) {
-            activeAudio.pause();
-            isPlaying = false;
-            if (activeButton) {
-                toggleIcon(activeButton, false);
-                activeButton = null;
-            }
-        }
-    }
-
-    function playStream(button) {
-        const streamUrl = button.dataset.stream;
-        if (!streamUrl) return;
-
-        if (activeButton === button && isPlaying) {
-            stopCurrentAudio();
-            return;
-        }
-
-        try {
-            const audio = audioStreams.get(streamUrl);
-            if (!audio) return;
-
-            if (activeAudio) {
-                stopCurrentAudio();
-            }
-
-            // Set volume before playing
-            const volumeControl = document.querySelector('.volume input[type="range"]');
-            if (volumeControl) {
-                audio.volume = volumeControl.value / 100;
-            }
-
-            toggleIcon(button, true);
-            
-            // Force reload for better start
-            if (!isPlaying && audio.readyState < 3) {
-                audio.load();
-            }
-
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isPlaying = true;
-                    activeButton = button;
-                    activeAudio = audio;
-                }).catch(error => {
-                    console.error('Playback failed:', error);
-                    stopCurrentAudio();
-                    toggleIcon(button, false);
-                });
-            }
-
-        } catch (error) {
-            console.error('Stream error:', error);
-            stopCurrentAudio();
-            toggleIcon(button, false);
-        }
-    }
-
     // Add click handlers to all stream buttons
-    const streamButtons = document.querySelectorAll('[data-stream]');
-    streamButtons.forEach(button => {
+    document.querySelectorAll('[data-stream]').forEach(button => {
         button.addEventListener('click', () => playStream(button));
     });
 
-    // Update volume controls to handle all volume inputs
+    // Volume control
     const volumeControls = document.querySelectorAll('.volume input[type="range"]');
     const volumeIcons = document.querySelectorAll('.volume i');
     let lastVolume = 80;
-    
-    function updateVolumeIcon(volumeLevel) {
+
+    function updateVolumeIcon(volume) {
         volumeIcons.forEach(icon => {
             icon.className = 'fas ' + (
-                volumeLevel === 0 ? 'fa-volume-mute' :
-                volumeLevel < 50 ? 'fa-volume-down' :
+                volume === 0 ? 'fa-volume-mute' :
+                volume < 50 ? 'fa-volume-down' :
                 'fa-volume-up'
             );
         });
     }
 
     function updateVolume(value) {
-        if (activeAudio) {
-            activeAudio.volume = value / 100;
-            lastVolume = value;
-            updateVolumeIcon(value);
-        }
+        const volume = value / 100;
+        audioStreams.forEach(audio => {
+            audio.volume = volume;
+        });
+        lastVolume = value;
+        updateVolumeIcon(value);
     }
+
+    volumeControls.forEach(control => {
+        control.value = lastVolume;
+        control.addEventListener('input', (e) => {
+            const newVolume = e.target.value;
+            volumeControls.forEach(vc => {
+                vc.value = newVolume;
+            });
+            updateVolume(newVolume);
+        });
+    });
 
     volumeIcons.forEach(icon => {
         icon.addEventListener('click', () => {
             if (!activeAudio) return;
-
+            
             if (activeAudio.volume > 0) {
                 lastVolume = activeAudio.volume * 100;
                 updateVolume(0);
@@ -192,24 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    volumeControls.forEach(control => {
-        control.value = lastVolume;
-
-        control.addEventListener('input', (e) => {
-            const newVolume = e.target.value;
-            volumeControls.forEach(vc => {
-                vc.value = newVolume;
-            });
-            updateVolume(newVolume);
-        });
-    });
-
-    // Optional: Keep the streams warm by periodically checking their status
+    // Keep streams warm
     setInterval(() => {
-        audioStreams.forEach((audio, url) => {
-            if (audio !== activeAudio && audio.readyState < 3) {
-                audio.load();
-            }
+        audioStreams.forEach(audio => {
+            if (!audio.paused) return;
+            audio.load();
         });
-    }, 30000); // Check every 30 seconds
+    }, 30000);
 });
