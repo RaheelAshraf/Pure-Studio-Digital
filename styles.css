@@ -1755,3 +1755,125 @@ section {
         font-size: 0.9rem;
     }
 }
+
+/* Mobile Nav Styles */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle:hover {
+    background: rgba(255, 45, 85, 0.2);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        display: none;
+    }
+    
+    .mobile-nav-toggle {
+        display: flex; /* Changed from display: block to display: flex */
+    }
+
+    /* Ensure the toggle is visible over other content */
+    .mobile-nav-toggle i {
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    z-index: 999;
+    padding: 6rem 2rem;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+}
+
+.mobile-nav.active {
+    display: block;
+}
+
+.mobile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav li {
+    margin: 2rem 0;
+    text-align: center;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav.active li {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.mobile-nav .nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: block;
+    padding: 1rem;
+}
+
+.mobile-nav .nav-link:hover {
+    color: #FF2D55;
+}
+
+.mobile-nav .mobile-listen {
+    display: inline-flex;
+    margin-top: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* Add animation delays for staggered entrance */
+.mobile-nav li:nth-child(1) { transition-delay: 0.1s; }
+.mobile-nav li:nth-child(2) { transition-delay: 0.2s; }
+.mobile-nav li:nth-child(3) { transition-delay: 0.3s; }
+.mobile-nav li:nth-child(4) { transition-delay: 0.4s; }
+
+body.nav-active {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        display: none;
+    }
+    
+    .mobile-nav-toggle {
+        display: block;
+    }
+}

@@ -1,42 +1,83 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Mobile Nav Implementation
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const mobileNav = document.querySelector('.mobile-nav');
+    const body = document.body;
+
+    function toggleMobileNav() {
+        const isOpen = mobileNav.classList.toggle('active');
+        body.classList.toggle('nav-active', isOpen);
+        const icon = mobileNavToggle.querySelector('i');
+        icon.classList.toggle('fa-bars');
+        icon.classList.toggle('fa-times');
+    }
+
+    mobileNavToggle.addEventListener('click', toggleMobileNav);
+
+    // Handle mobile navigation clicks
+    document.querySelectorAll('.mobile-nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            
+            // Handle special cases
+            if (href === '/') {
+                e.preventDefault();
+                toggleMobileNav();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            
+            // Handle anchor links
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    toggleMobileNav();
+                    setTimeout(() => {
+                        const headerOffset = 60;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }, 300);
+                }
+            }
+        });
+    });
+
     let activeAudio = null;
     let isPlaying = false;
     let activeButton = null;
     const audioStreams = new Map();
+    
+    // Pre-initialize the main stream immediately
+    const mainStreamUrl = 'http://live3.rcast.net:9150/;stream';
+    const mainAudio = new Audio();
+    mainAudio.preload = "auto";
+    mainAudio.crossOrigin = "anonymous";
+    mainAudio.src = mainStreamUrl;
+    
+    // Optimize initial loading
+    mainAudio.load();
+    audioStreams.set(mainStreamUrl, mainAudio);
 
-    // Initialize audio elements early
-    const streamButtons = document.querySelectorAll('[data-stream]');
-    streamButtons.forEach(button => {
-        const streamUrl = button.dataset.stream;
-        if (streamUrl) {
-            const audio = new Audio();
-            audio.preload = "auto"; // Force preload
-            audio.crossOrigin = "anonymous";
-            audio.src = streamUrl;
-            
-            // Set low latency mode where supported
-            if (typeof audio.mozPreservesPitch !== 'undefined') {
-                audio.mozPreservesPitch = false;
-            }
-            
-            // Reduce buffer size for quicker start
-            if (typeof audio.buffered !== 'undefined') {
+    // Initialize other streams with delay
+    setTimeout(() => {
+        const streamButtons = document.querySelectorAll('[data-stream]');
+        streamButtons.forEach(button => {
+            const streamUrl = button.dataset.stream;
+            if (streamUrl && streamUrl !== mainStreamUrl && !audioStreams.has(streamUrl)) {
+                const audio = new Audio();
                 audio.preload = "auto";
+                audio.crossOrigin = "anonymous";
+                audio.src = streamUrl;
+                audioStreams.set(streamUrl, audio);
             }
-
-            // Start loading the stream
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    audio.pause(); // Pause immediately but keep buffer
-                }).catch(() => {
-                    // Ignore initial play error
-                });
-            }
-
-            audioStreams.set(streamUrl, audio);
-        }
-    });
+        });
+    }, 2000); // Delay other streams initialization
 
     function toggleIcon(button, playing) {
         const icon = button.querySelector('i');
@@ -67,26 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // If same stream was just paused, resume quickly
-            if (activeAudio && activeAudio === audioStreams.get(streamUrl)) {
-                toggleIcon(button, true);
-                activeAudio.play()
-                    .then(() => {
-                        isPlaying = true;
-                        activeButton = button;
-                    })
-                    .catch(error => {
-                        console.error('Resume failed:', error);
-                        stopCurrentAudio();
-                        toggleIcon(button, false);
-                    });
-                return;
-            }
-
-            stopCurrentAudio();
-
             const audio = audioStreams.get(streamUrl);
             if (!audio) return;
+
+            if (activeAudio) {
+                stopCurrentAudio();
+            }
 
             // Set volume before playing
             const volumeControl = document.querySelector('.volume input[type="range"]');
@@ -96,18 +123,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             toggleIcon(button, true);
             
-            // Immediate play attempt
-            audio.play()
-                .then(() => {
+            // Force reload for better start
+            if (!isPlaying && audio.readyState < 3) {
+                audio.load();
+            }
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
                     isPlaying = true;
                     activeButton = button;
                     activeAudio = audio;
-                })
-                .catch(error => {
+                }).catch(error => {
                     console.error('Playback failed:', error);
                     stopCurrentAudio();
                     toggleIcon(button, false);
                 });
+            }
 
         } catch (error) {
             console.error('Stream error:', error);
@@ -117,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add click handlers to all stream buttons
+    const streamButtons = document.querySelectorAll('[data-stream]');
     streamButtons.forEach(button => {
         button.addEventListener('click', () => playStream(button));
     });
