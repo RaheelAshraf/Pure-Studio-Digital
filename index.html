@@ -10,42 +10,24 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <a href="#" class="logo">
-                    <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" alt="Pure Soul Digital Logo">
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" alt="Pure Soul Digital">
+            </a>
+            
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="/" class="nav-link active">Home</a>
+                    <a href="#advertise" class="nav-link">Advertise</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </nav>
+                <a href="#" class="listen-now-btn" id="navListenBtn" data-stream="http://live3.rcast.net:9150/;stream">
+                    <i class="fas fa-play"></i>
+                    Listen Live
                 </a>
-                
-                <div class="nav-menu">
-                    <div class="nav-links">
-                        <a href="#" class="nav-link active">
-                            <i class="fas fa-home"></i>Home
-                        </a>
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-broadcast-tower"></i>Live
-                        </a>
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-calendar"></i>Schedule
-                        </a>
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-microphone-alt"></i>Shows
-                        </a>
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-envelope"></i>Contact
-                        </a>
-                    </div>
-                    <a href="#" class="listen-now-btn">
-                        <i class="fas fa-play"></i>
-                        Listen Now
-                    </a>
-                </div>
-                
-                <button class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
-        </nav>
+        </div>
     </header>
 
     <section class="hero">
@@ -76,7 +58,7 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="play-btn">
+                    <button class="play-btn main-stream" data-stream="http://live3.rcast.net:9150/;stream">
                         <i class="fas fa-play"></i>
                         Start Listening
                     </button>
@@ -113,7 +95,7 @@
                             </span>
                         </div>
                         <div class="station-actions">
-                            <button class="action-btn play-btn">
+                            <button class="action-btn play-btn" data-stream="https://stream.zeno.fm/01pg7vn11zhvv">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -142,7 +124,7 @@
                             </span>
                         </div>
                         <div class="station-actions">
-                            <button class="action-btn play-btn">
+                            <button class="action-btn play-btn" data-stream="https://stream.zeno.fm/01pg7vn11zhvv">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -171,7 +153,7 @@
                             </span>
                         </div>
                         <div class="station-actions">
-                            <button class="action-btn play-btn">
+                            <button class="action-btn play-btn" data-stream="https://stream.zeno.fm/01pg7vn11zhvv">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -228,6 +210,14 @@
                         <li>Newsletter Features</li>
                         <li>Social Media Integration</li>
                     </ul>
+                </div>
+            </div>
+            <div class="advertise-footer">
+                <a href="#contact" class="advertise-cta">
+                    Start Advertising Today <i class="fas fa-arrow-right"></i>
+                </a>
+                <div class="advertise-contact">
+                    <strong>Questions?</strong> Contact our advertising team at <strong>advertising@watj.com</strong>
                 </div>
             </div>
         </div>
@@ -361,6 +351,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>
