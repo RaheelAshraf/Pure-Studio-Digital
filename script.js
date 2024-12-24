@@ -2,9 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeAudio = null;
     let isPlaying = false;
     let activeButton = null;
+    const audioStreams = new Map(); // Store pre-buffered audio elements
 
     // Get all buttons that can play streams
     const streamButtons = document.querySelectorAll('[data-stream]');
+
+    // Pre-create audio elements for each stream
+    streamButtons.forEach(button => {
+        const streamUrl = button.dataset.stream;
+        if (streamUrl) {
+            const audio = new Audio();
+            audio.preload = "auto";
+            audio.src = streamUrl;
+            // Keep the audio element ready but suspended
+            audio.load();
+            audioStreams.set(streamUrl, audio);
+        }
+    });
 
     function toggleIcon(button, playing) {
         const icon = button.querySelector('i');
@@ -17,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopCurrentAudio() {
         if (activeAudio) {
             activeAudio.pause();
-            activeAudio.remove();
-            activeAudio = null;
+            // Don't reset the source anymore, just pause
             isPlaying = false;
             if (activeButton) {
                 toggleIcon(activeButton, false);
@@ -37,22 +50,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Stop any existing stream first
-        stopCurrentAudio();
-
         try {
-            // Create and configure audio element
-            const audio = document.createElement('audio');
-            audio.src = streamUrl;
-            document.body.appendChild(audio);
-            
-            // Set initial volume
+            // If it's the same stream that was just stopped
+            if (activeAudio && activeAudio === audioStreams.get(streamUrl)) {
+                // Simply resume playback
+                toggleIcon(button, true);
+                const resumePromise = activeAudio.play();
+                
+                resumePromise.then(() => {
+                    isPlaying = true;
+                    activeButton = button;
+                }).catch(error => {
+                    console.error('Resume failed:', error);
+                    stopCurrentAudio();
+                    toggleIcon(button, false);
+                });
+                return;
+            }
+
+            // Stop any existing stream first
+            stopCurrentAudio();
+
+            // Get the pre-buffered audio element
+            const audio = audioStreams.get(streamUrl);
+            if (!audio) return;
+
+            // Set initial volume from any volume control
             const volumeControl = document.querySelector('.volume input[type="range"]');
             if (volumeControl) {
                 audio.volume = volumeControl.value / 100;
             }
 
-            // Show loading state
+            // Show loading state immediately
             toggleIcon(button, true);
 
             // Start playback immediately
@@ -82,13 +111,62 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => playStream(button));
     });
 
-    // Volume control
-    const volumeControl = document.querySelector('.volume input[type="range"]');
-    if (volumeControl) {
-        volumeControl.addEventListener('input', (e) => {
-            if (activeAudio) {
-                activeAudio.volume = e.target.value / 100;
-            }
+    // Update volume controls to handle all volume inputs
+    const volumeControls = document.querySelectorAll('.volume input[type="range"]');
+    const volumeIcons = document.querySelectorAll('.volume i');
+    let lastVolume = 80;
+    
+    function updateVolumeIcon(volumeLevel) {
+        volumeIcons.forEach(icon => {
+            icon.className = 'fas ' + (
+                volumeLevel === 0 ? 'fa-volume-mute' :
+                volumeLevel < 50 ? 'fa-volume-down' :
+                'fa-volume-up'
+            );
         });
     }
+
+    function updateVolume(value) {
+        if (activeAudio) {
+            activeAudio.volume = value / 100;
+            lastVolume = value;
+            updateVolumeIcon(value);
+        }
+    }
+
+    volumeIcons.forEach(icon => {
+        icon.addEventListener('click', () => {
+            if (!activeAudio) return;
+
+            if (activeAudio.volume > 0) {
+                lastVolume = activeAudio.volume * 100;
+                updateVolume(0);
+                volumeControls.forEach(vc => vc.value = 0);
+            } else {
+                updateVolume(lastVolume);
+                volumeControls.forEach(vc => vc.value = lastVolume);
+            }
+        });
+    });
+
+    volumeControls.forEach(control => {
+        control.value = lastVolume;
+
+        control.addEventListener('input', (e) => {
+            const newVolume = e.target.value;
+            volumeControls.forEach(vc => {
+                vc.value = newVolume;
+            });
+            updateVolume(newVolume);
+        });
+    });
+
+    // Optional: Keep the streams warm by periodically checking their status
+    setInterval(() => {
+        audioStreams.forEach((audio, url) => {
+            if (audio !== activeAudio && audio.readyState < 3) {
+                audio.load();
+            }
+        });
+    }, 30000); // Check every 30 seconds
 });
