@@ -8,6 +8,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <!-- Add these lines for faster audio loading -->
+    <link rel="preconnect" href="https://ice5.somafm.com">
+    <link rel="preconnect" href="https://stream.zeno.fm">
+    <link rel="preconnect" href="https://stream4.rcast.net">
+    
+    <!-- Preload main stream -->
+    <link rel="preload" as="audio" href="https://ice5.somafm.com/seventies-128-mp3">
+
+    <!-- Add preload for critical images -->
+    <link rel="preload" as="image" href="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75" fetchpriority="high">
 </head>
 <body>
     <button class="mobile-nav-toggle">
@@ -31,7 +43,11 @@
     <header class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
-                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" alt="Pure Soul Digital">
+                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" 
+                     alt="Pure Soul Digital"
+                     width="48" 
+                     height="48"
+                     loading="eager">
             </a>
             
             <div class="nav-menu">
@@ -64,7 +80,13 @@
                 <div class="player-box">
                     <div class="now-playing">NOW PLAYING</div>
                     <div class="track-container">
-                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&q=80" alt="Track Art">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=160&q=75" 
+                             srcset="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=160&q=75 1x,
+                                     https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=320&q=75 2x"
+                             alt="Track Art"
+                             width="80"
+                             height="80"
+                             loading="eager">
                         <div class="track-info">
                             <div class="track-title">Loading...</div>
                             <div class="track-artist">Pure Soul Digital</div>
@@ -94,7 +116,13 @@
             <div class="stations-grid">
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&q=80" alt="Gospel Vibes">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=400&q=75" 
+                             srcset="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=400&q=75 1x,
+                                     https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75 2x"
+                             alt="Gospel Vibes"
+                             width="400"
+                             height="225"
+                             loading="lazy">
                     </div>
                     <div class="station-content">
                         <div class="station-header">
@@ -123,7 +151,13 @@
 
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&q=80" alt="Jazz Lounge">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=400&q=75" 
+                             srcset="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=400&q=75 1x,
+                                     https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=800&q=75 2x"
+                             alt="Jazz Lounge"
+                             width="400"
+                             height="225"
+                             loading="lazy">
                     </div>
                     <div class="station-content">
                         <div class="station-header">
@@ -152,7 +186,13 @@
 
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&q=80" alt="Classical Hour">
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=400&q=75" 
+                             srcset="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=400&q=75 1x,
+                                     https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=800&q=75 2x"
+                             alt="Classical Hour"
+                             width="400"
+                             height="225"
+                             loading="lazy">
                     </div>
                     <div class="station-content">
                         <div class="station-header">

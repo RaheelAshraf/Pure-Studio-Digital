@@ -53,154 +53,141 @@ document.addEventListener('DOMContentLoaded', () => {
 
     class AudioBufferManager {
         constructor() {
+            // Initialize audio immediately
             this.audio = new Audio();
+            this.audio.preload = "auto";
+            this.audio.crossOrigin = "anonymous";
             this.isPlaying = false;
             this.activeButton = null;
             this.lastVolume = 80;
-            this.loadingStates = new Map();
+            this.isLoading = false;
 
-            // Configure audio element
-            this.audio.preload = "auto";
-            this.audio.crossOrigin = "anonymous";
+            // Set volume immediately
+            this.audio.volume = this.lastVolume / 100;
 
-            // Set initial volume
-            const volumeControl = document.querySelector('.volume input[type="range"]');
-            if (volumeControl) {
-                this.audio.volume = volumeControl.value / 100;
-            }
+            // Add loading state listeners
+            this.audio.addEventListener('waiting', () => this.setLoadingState(true));
+            this.audio.addEventListener('playing', () => this.setLoadingState(false));
+            this.audio.addEventListener('error', () => this.setLoadingState(false));
 
-            // Add event listeners
-            this.audio.addEventListener('canplay', () => {
-                this.hideLoading(this.activeButton);
-            });
-
-            this.audio.addEventListener('waiting', () => {
-                if (this.activeButton) this.showLoading(this.activeButton);
-            });
-
-            this.audio.addEventListener('playing', () => {
-                if (this.activeButton) this.hideLoading(this.activeButton);
-            });
-
-            this.audio.addEventListener('error', (e) => {
-                console.error('Audio error:', e);
-                this.hideLoading(this.activeButton);
-                this.updateButtonState(this.activeButton, false);
-            });
-
-            // Preload streams
-            this.preloadStreams();
-        }
-
-        showLoading(button) {
-            if (!button) return;
-            const icon = button.querySelector('i');
-            if (icon) {
-                icon.className = 'fas fa-spinner fa-spin';
-            }
-            button.classList.add('loading');
-        }
-
-        hideLoading(button) {
-            if (!button) return;
-            button.classList.remove('loading');
-            this.updateButtonState(button, this.isPlaying);
-        }
-
-        preloadStreams() {
+            // Pre-initialize streams
             document.querySelectorAll('[data-stream]').forEach(button => {
-                const streamUrl = button.dataset.stream;
-                if (!streamUrl) return;
-
-                // Create a temporary audio element for preloading
-                const temp = new Audio();
-                temp.preload = "metadata";
-                temp.src = streamUrl;
-                
-                // Store loading state
-                this.loadingStates.set(streamUrl, false);
-                
-                temp.addEventListener('loadedmetadata', () => {
-                    this.loadingStates.set(streamUrl, true);
-                    temp.remove(); // Clean up
-                });
-            });
-        }
-
-        togglePlayback(button) {
-            if (!button || !button.dataset.stream) return;
-
-            // Handle same button toggle
-            if (this.activeButton === button) {
-                if (this.isPlaying) {
-                    this.pause();
-                } else {
-                    this.play(button);
+                const stream = button.dataset.stream;
+                if (stream) {
+                    const preloadLink = document.createElement('link');
+                    preloadLink.rel = 'preconnect';
+                    preloadLink.href = new URL(stream).origin;
+                    document.head.appendChild(preloadLink);
                 }
-                return;
-            }
+            });
 
-            // Switch to new stream
-            if (this.isPlaying) {
-                this.pause();
-            }
-            this.play(button);
+            // Add abort controller for loading states
+            this.currentLoadingController = null;
         }
 
-        play(button) {
-            const streamUrl = button.dataset.stream;
-            
-            // Show loading immediately
-            this.showLoading(button);
-            
-            // Update audio source if it's a new stream
-            if (this.audio.src !== streamUrl) {
-                this.audio.src = streamUrl;
+        clearCurrentStream() {
+            // Clear loading state if any
+            if (this.currentLoadingController) {
+                this.currentLoadingController.abort();
+                this.currentLoadingController = null;
+            }
+
+            // Clear current playback
+            if (this.audio) {
+                this.audio.pause();
+                this.audio.src = '';
                 this.audio.load();
             }
 
-            // Attempt playback immediately
-            const playPromise = this.audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    this.isPlaying = true;
-                    this.activeButton = button;
-                    this.hideLoading(button);
-                    this.updateAllButtons();
-                }).catch(error => {
-                    console.error('Playback failed:', error);
-                    this.hideLoading(button);
-                });
+            // Reset UI states
+            if (this.activeButton) {
+                this.setLoadingState(false);
+                this.updateButtonState(this.activeButton, false);
+            }
+
+            this.isPlaying = false;
+            this.activeButton = null;
+        }
+
+        setLoadingState(isLoading) {
+            this.isLoading = isLoading;
+            if (this.activeButton) {
+                const icon = this.activeButton.querySelector('i');
+                const loadingSpinner = this.activeButton.querySelector('.loading-spinner');
+                
+                if (isLoading) {
+                    this.activeButton.classList.add('loading');
+                    if (!loadingSpinner) {
+                        icon.style.display = 'none';
+                        const spinner = document.createElement('div');
+                        spinner.className = 'loading-spinner';
+                        this.activeButton.insertBefore(spinner, icon);
+                    }
+                } else {
+                    this.activeButton.classList.remove('loading');
+                    if (loadingSpinner) {
+                        loadingSpinner.remove();
+                        icon.style.display = '';
+                    }
+                    this.updateButtonState(this.activeButton, this.isPlaying);
+                }
             }
         }
 
+        togglePlayback(button) {
+            if (!button?.dataset.stream) return;
+
+            // If same button is clicked while playing, just pause
+            if (this.activeButton === button && this.isPlaying) {
+                this.pause();
+                return;
+            }
+
+            // Clear any existing stream before starting new one
+            this.clearCurrentStream();
+
+            // Create new abort controller for this stream
+            this.currentLoadingController = new AbortController();
+            
+            // Show loading state immediately
+            this.setLoadingState(true);
+            this.activeButton = button;
+            
+            // Start new stream
+            const streamUrl = button.dataset.stream;
+            this.audio.src = streamUrl;
+            this.audio.load();
+            this.audio.play().then(() => {
+                this.isPlaying = true;
+                this.updateButtonState(button, true);
+            }).catch(error => {
+                if (error.name !== 'AbortError') {
+                    console.error('Playback failed:', error);
+                    this.clearCurrentStream();
+                }
+            });
+        }
+
         pause() {
-            this.audio.pause();
-            this.isPlaying = false;
-            this.updateButtonState(this.activeButton, false);
-            this.activeButton = null;
+            this.clearCurrentStream();
         }
 
         updateButtonState(button, playing) {
             if (!button) return;
             const icon = button.querySelector('i');
-            if (icon && !button.classList.contains('loading')) {
+            if (icon) {
                 icon.className = `fas ${playing ? 'fa-pause' : 'fa-play'}`;
             }
         }
 
-        updateAllButtons() {
-            document.querySelectorAll('[data-stream]').forEach(button => {
-                this.updateButtonState(button, button === this.activeButton && this.isPlaying);
-            });
-        }
-
         setVolume(value) {
+            if (!this.audio) return;
             this.audio.volume = value / 100;
             this.lastVolume = value;
         }
 
         toggleMute() {
+            if (!this.audio) return true;
             if (this.audio.volume > 0) {
                 this.lastVolume = this.audio.volume * 100;
                 this.setVolume(0);
@@ -212,27 +199,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize Audio Manager
+    // Initialize Audio Manager immediately
     const audioManager = new AudioBufferManager();
 
-    // Handle all play buttons with debounce
-    const debounce = (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    };
-
+    // Direct click handling without debounce
     document.querySelectorAll('[data-stream]').forEach(button => {
-        button.addEventListener('click', debounce((e) => {
+        button.addEventListener('click', (e) => {
             e.preventDefault();
             audioManager.togglePlayback(button);
-        }, 300));
+        });
     });
 
     // Volume Controls
