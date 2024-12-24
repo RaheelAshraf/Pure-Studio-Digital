@@ -2,20 +2,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeAudio = null;
     let isPlaying = false;
     let activeButton = null;
-    const audioStreams = new Map(); // Store pre-buffered audio elements
+    const audioStreams = new Map();
 
-    // Get all buttons that can play streams
+    // Initialize audio elements early
     const streamButtons = document.querySelectorAll('[data-stream]');
-
-    // Pre-create audio elements for each stream
     streamButtons.forEach(button => {
         const streamUrl = button.dataset.stream;
         if (streamUrl) {
             const audio = new Audio();
-            audio.preload = "auto";
+            audio.preload = "auto"; // Force preload
+            audio.crossOrigin = "anonymous";
             audio.src = streamUrl;
-            // Keep the audio element ready but suspended
-            audio.load();
+            
+            // Set low latency mode where supported
+            if (typeof audio.mozPreservesPitch !== 'undefined') {
+                audio.mozPreservesPitch = false;
+            }
+            
+            // Reduce buffer size for quicker start
+            if (typeof audio.buffered !== 'undefined') {
+                audio.preload = "auto";
+            }
+
+            // Start loading the stream
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audio.pause(); // Pause immediately but keep buffer
+                }).catch(() => {
+                    // Ignore initial play error
+                });
+            }
+
             audioStreams.set(streamUrl, audio);
         }
     });
@@ -31,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopCurrentAudio() {
         if (activeAudio) {
             activeAudio.pause();
-            // Don't reset the source anymore, just pause
             isPlaying = false;
             if (activeButton) {
                 toggleIcon(activeButton, false);
@@ -44,60 +61,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const streamUrl = button.dataset.stream;
         if (!streamUrl) return;
 
-        // If same button clicked, stop playing
         if (activeButton === button && isPlaying) {
             stopCurrentAudio();
             return;
         }
 
         try {
-            // If it's the same stream that was just stopped
+            // If same stream was just paused, resume quickly
             if (activeAudio && activeAudio === audioStreams.get(streamUrl)) {
-                // Simply resume playback
                 toggleIcon(button, true);
-                const resumePromise = activeAudio.play();
-                
-                resumePromise.then(() => {
-                    isPlaying = true;
-                    activeButton = button;
-                }).catch(error => {
-                    console.error('Resume failed:', error);
-                    stopCurrentAudio();
-                    toggleIcon(button, false);
-                });
+                activeAudio.play()
+                    .then(() => {
+                        isPlaying = true;
+                        activeButton = button;
+                    })
+                    .catch(error => {
+                        console.error('Resume failed:', error);
+                        stopCurrentAudio();
+                        toggleIcon(button, false);
+                    });
                 return;
             }
 
-            // Stop any existing stream first
             stopCurrentAudio();
 
-            // Get the pre-buffered audio element
             const audio = audioStreams.get(streamUrl);
             if (!audio) return;
 
-            // Set initial volume from any volume control
+            // Set volume before playing
             const volumeControl = document.querySelector('.volume input[type="range"]');
             if (volumeControl) {
                 audio.volume = volumeControl.value / 100;
             }
 
-            // Show loading state immediately
             toggleIcon(button, true);
-
-            // Start playback immediately
-            const playPromise = audio.play();
             
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
+            // Immediate play attempt
+            audio.play()
+                .then(() => {
                     isPlaying = true;
                     activeButton = button;
                     activeAudio = audio;
-                }).catch(error => {
+                })
+                .catch(error => {
                     console.error('Playback failed:', error);
                     stopCurrentAudio();
                     toggleIcon(button, false);
                 });
-            }
 
         } catch (error) {
             console.error('Stream error:', error);
