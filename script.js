@@ -1,88 +1,94 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const streamUrl = 'http://live3.rcast.net:9150/;stream';
-    const audio = new Audio();
-    audio.preload = 'auto';
+    let activeAudio = null;
     let isPlaying = false;
     let activeButton = null;
 
-    const navButton = document.getElementById('navListenBtn');
-    const heroButton = document.querySelector('.play-btn.main-stream');
-    const featuredButtons = document.querySelectorAll('.action-btn.play-btn');
-
-    // Pre-buffer main stream
-    audio.src = streamUrl;
-    audio.load();
+    // Get all buttons that can play streams
+    const streamButtons = document.querySelectorAll('[data-stream]');
 
     function toggleIcon(button, playing) {
         const icon = button.querySelector('i');
-        if (playing) {
-            icon.classList.remove('fa-play');
-            icon.classList.add('fa-pause');
-        } else {
-            icon.classList.remove('fa-pause');
-            icon.classList.add('fa-play');
+        if (icon) {
+            icon.classList.remove(playing ? 'fa-play' : 'fa-pause');
+            icon.classList.add(playing ? 'fa-pause' : 'fa-play');
         }
     }
 
-    function resetOtherButtons(activeBtn) {
-        if (navButton && navButton !== activeBtn) toggleIcon(navButton, false);
-        if (heroButton && heroButton !== activeBtn) toggleIcon(heroButton, false);
-        featuredButtons.forEach(btn => {
-            if (btn !== activeBtn) toggleIcon(btn, false);
-        });
-    }
-
-    function toggleStream(button, url) {
-        if (isPlaying && activeButton === button) {
-            audio.pause();
+    function stopCurrentAudio() {
+        if (activeAudio) {
+            activeAudio.pause();
+            activeAudio.remove();
+            activeAudio = null;
             isPlaying = false;
-            activeButton = null;
-            toggleIcon(button, false);
-        } else {
             if (activeButton) {
                 toggleIcon(activeButton, false);
+                activeButton = null;
             }
-            resetOtherButtons(button);
+        }
+    }
 
-            if (audio.src !== url) {
-                audio.src = url;
-            }
+    function playStream(button) {
+        const streamUrl = button.dataset.stream;
+        if (!streamUrl) return;
+
+        // If same button clicked, stop playing
+        if (activeButton === button && isPlaying) {
+            stopCurrentAudio();
+            return;
+        }
+
+        // Stop any existing stream first
+        stopCurrentAudio();
+
+        try {
+            // Create and configure audio element
+            const audio = document.createElement('audio');
+            audio.src = streamUrl;
+            document.body.appendChild(audio);
             
+            // Set initial volume
+            const volumeControl = document.querySelector('.volume input[type="range"]');
+            if (volumeControl) {
+                audio.volume = volumeControl.value / 100;
+            }
+
+            // Show loading state
             toggleIcon(button, true);
-            audio.play();
-            isPlaying = true;
-            activeButton = button;
+
+            // Start playback immediately
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    activeButton = button;
+                    activeAudio = audio;
+                }).catch(error => {
+                    console.error('Playback failed:', error);
+                    stopCurrentAudio();
+                    toggleIcon(button, false);
+                });
+            }
+
+        } catch (error) {
+            console.error('Stream error:', error);
+            stopCurrentAudio();
+            toggleIcon(button, false);
         }
     }
 
-    // Add click handlers
-    navButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleStream(navButton, streamUrl);
+    // Add click handlers to all stream buttons
+    streamButtons.forEach(button => {
+        button.addEventListener('click', () => playStream(button));
     });
 
-    heroButton.addEventListener('click', () => {
-        toggleStream(heroButton, streamUrl);
-    });
-
-    // Add click handlers to featured station buttons
-    featuredButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const buttonStreamUrl = button.dataset.stream;
-            if (buttonStreamUrl) {
-                toggleStream(button, buttonStreamUrl);
+    // Volume control
+    const volumeControl = document.querySelector('.volume input[type="range"]');
+    if (volumeControl) {
+        volumeControl.addEventListener('input', (e) => {
+            if (activeAudio) {
+                activeAudio.volume = e.target.value / 100;
             }
         });
-    });
-
-    // Handle errors silently in background
-    audio.addEventListener('error', () => {
-        if (isPlaying) {
-            isPlaying = false;
-            if (activeButton) {
-                toggleIcon(activeButton, false);
-            }
-            activeButton = null;
-        }
-    });
+    }
 });
