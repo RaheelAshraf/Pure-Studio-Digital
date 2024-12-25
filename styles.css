@@ -351,7 +351,8 @@ section {
     justify-content: center;
     text-align: center;
     padding: 2rem;
-    margin-top: 80px;
+    margin-top: 0; /* Remove default margin */
+    padding-top: calc(73px + 2rem); /* Account for mobile header height + padding */
     isolation: isolate;
 }
 
@@ -434,20 +435,64 @@ section {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
     animation: fadeInUp 1s ease-out 0.5s both;
 }
 
-.station-genres::before,
-.station-genres::after {
+.station-genres span {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Replace bullet points with custom styled dots */
+.station-genres span:not(:last-child)::after {
     content: '';
-    height: 1px;
-    width: 100px;
-    background: linear-gradient(to right, 
-        transparent,
-        rgba(255, 45, 85, 0.6),
-        transparent
-    );
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(135deg, #FF2D55, #FF4F7A);
+    border-radius: 50%;
+    position: absolute;
+    right: -0.75rem;
+    box-shadow: 
+        0 0 10px rgba(255, 45, 85, 0.4),
+        0 0 20px rgba(255, 45, 85, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+/* Update responsive styles */
+@media (max-width: 768px) {
+    .station-genres {
+        font-size: 0.9rem;
+        letter-spacing: 3px;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 300px;
+        margin: 0 auto 4rem auto;
+        line-height: 2;
+    }
+
+    .station-genres span:not(:last-child)::after {
+        width: 3px;
+        height: 3px;
+        right: -0.75rem;
+    }
 }
 
 .player-container {
@@ -705,6 +750,8 @@ section {
 @media (max-width: 768px) {
     .hero {
         padding: 1rem;
+        margin-top: 0;
+        padding-top: 73px; /* Match mobile header height exactly */
     }
 
     .station-title {
@@ -1552,18 +1599,20 @@ section {
     }
 }
 
+/* Update Mobile Nav Styles */
 .mobile-nav {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(15, 15, 30, 0.98);
+    backdrop-filter: blur(10px);
     display: none;
     z-index: 999;
-    padding: 6rem 2rem;
+    padding: 0;
     overflow-y: auto;
-    backdrop-filter: blur(10px);
+    padding-top: 80px; /* Match the header height + some padding */
 }
 
 .mobile-nav.active {
@@ -1571,53 +1620,98 @@ section {
 }
 
 .mobile-nav ul {
-    list-style: none;
-    padding: 0;
+    list-style: none; /* Remove list bullets */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 73px);
+    gap: 2rem;
+    padding: 2rem;
     margin: 0;
+    width: 100%;
 }
 
 .mobile-nav li {
-    margin: 2rem 0;
+    width: 100%;
+    max-width: 320px;
     text-align: center;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.mobile-nav.active li {
-    transform: translateY(0);
-    opacity: 1;
+    list-style-type: none; /* Ensure no bullets */
 }
 
 .mobile-nav .nav-link {
-    color: #fff;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    width: 100%;
+    text-align: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
-    font-size: 1.4rem;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    display: block;
-    padding: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 .mobile-nav .nav-link:hover {
-    color: #FF2D55;
+    background: rgba(255, 45, 85, 0.1);
+    border-color: rgba(255, 45, 85, 0.2);
+    color: white;
+    transform: translateY(-2px);
 }
 
 .mobile-nav .mobile-listen {
-    display: inline-flex;
     margin-top: 1rem;
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(135deg, #FF2D55 0%, #FF4F7A 100%);
+    border: none;
+    font-weight: 600;
+    padding: 1.2rem 2rem;
 }
 
-/* Add animation delays for staggered entrance */
-.mobile-nav li:nth-child(1) { transition-delay: 0.1s; }
-.mobile-nav li:nth-child(2) { transition-delay: 0.2s; }
-.mobile-nav li:nth-child(3) { transition-delay: 0.3s; }
-.mobile-nav li:nth-child(4) { transition-delay: 0.4s; }
+.mobile-nav .mobile-listen:hover {
+    background: linear-gradient(135deg, #FF4F7A 0%, #FF2D55 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 10px 20px rgba(255, 45, 85, 0.2),
+        0 0 15px rgba(255, 45, 85, 0.15);
+}
 
-body.nav-active {
-    overflow: hidden;
+@media (max-width: 768px) {
+    .mobile-nav {
+        padding-top: 73px; /* Match exactly with header height */
+    }
+
+    .mobile-nav ul {
+        padding: 2rem;
+    }
+
+    .mobile-nav li {
+        width: 100%;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+}
+
+/* Update mobile nav toggle positioning */
+.mobile-nav-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+    background: rgba(15, 15, 30, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {
@@ -1626,7 +1720,34 @@ body.nav-active {
     }
     
     .mobile-nav-toggle {
-        display: block;
+        display: flex;
+    }
+
+    .mobile-nav {
+        padding-top: 6rem;
+    }
+
+    .mobile-nav ul {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .mobile-nav .nav-link {
+        font-size: 1.2rem;
+        padding: 0.75rem 1.5rem;
+        width: 100%;
+        text-align: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .mobile-nav .mobile-listen {
+        margin-top: 2rem;
+        width: 100%;
+        max-width: 280px;
     }
 }
 
@@ -1824,4 +1945,154 @@ body.nav-active {
 html {
     scroll-padding-top: 100px; /* Adjust based on navbar height */
     scroll-behavior: smooth;
+}
+
+/* Add Mobile Header Styles */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem 2rem;
+    background: rgba(15, 15, 30, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    height: 73px; /* Set explicit height to match the padding we use */
+}
+
+.mobile-header .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-header .logo {
+    padding: 0;
+}
+
+.mobile-header .logo img {
+    height: 40px;
+    width: auto;
+    filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.3));
+}
+
+/* Update mobile nav styles */
+.mobile-nav {
+    margin-top: 73px; /* Height of mobile header */
+    padding-top: 1rem;
+}
+
+/* Update media queries */
+@media (max-width: 768px) {
+    .navbar {
+        display: none;
+    }
+    
+    .mobile-header {
+        display: block;
+    }
+
+    .mobile-nav-toggle {
+        display: flex;
+    }
+
+    /* Remove the header from mobile nav since we have it permanently visible now */
+    .mobile-nav-header {
+        display: none;
+    }
+
+    .mobile-nav {
+        top: 73px; /* Align with bottom of header exactly */
+        margin-top: 0; /* Remove margin */
+    }
+}
+
+/* Update Mobile Nav Styles */
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 30, 0.98);
+    backdrop-filter: blur(10px);
+    display: none;
+    z-index: 999;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.mobile-nav ul {
+    list-style: none; /* Remove list bullets */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 73px);
+    gap: 2rem;
+    padding: 2rem;
+    margin: 0;
+    width: 100%;
+}
+
+.mobile-nav li {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    list-style-type: none; /* Ensure no bullets */
+}
+
+.mobile-nav .nav-link {
+    font-size: 1.1rem;
+    padding: 1.2rem;
+    width: 100%;
+    text-align: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: block;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.mobile-nav .nav-link:hover {
+    background: rgba(255, 45, 85, 0.1);
+    border-color: rgba(255, 45, 85, 0.2);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-nav .mobile-listen {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #FF2D55 0%, #FF4F7A 100%);
+    border: none;
+    font-weight: 600;
+    padding: 1.3rem;
+    font-size: 1.1rem;
+}
+
+.mobile-nav .mobile-listen:hover {
+    background: linear-gradient(135deg, #FF4F7A 0%, #FF2D55 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 10px 20px rgba(255, 45, 85, 0.2),
+        0 0 15px rgba(255, 45, 85, 0.15);
+}
+
+@media (max-width: 768px) {
+    .mobile-nav {
+        top: 73px; /* Align with bottom of header exactly */
+    }
+
+    .mobile-nav ul {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
 }
