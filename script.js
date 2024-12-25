@@ -51,6 +51,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Navigation active state handling
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function setActiveLink(hash) {
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if ((hash === '' && link.getAttribute('href') === '/') || 
+                (hash && link.getAttribute('href') === hash)) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Handle click events on nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (link.getAttribute('href') === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setActiveLink('');
+            } else {
+                setActiveLink(link.getAttribute('href'));
+            }
+        });
+    });
+
+    // Handle scroll to update active state
+    function highlightNavOnScroll() {
+        const scrollPos = window.scrollY + 100; // Offset for better trigger point
+
+        // Check if we're at the top of the page
+        if (scrollPos < 100) {
+            setActiveLink('');
+            return;
+        }
+
+        // Otherwise check which section we're in
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            
+            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                setActiveLink('#' + section.getAttribute('id'));
+            }
+        });
+    }
+
+    // Add scroll event listener
+    window.addEventListener('scroll', highlightNavOnScroll);
+    
+    // Set initial active state
+    if (window.location.hash) {
+        setActiveLink(window.location.hash);
+    } else {
+        setActiveLink('');
+    }
+
     class AudioBufferManager {
         constructor() {
             // Initialize audio immediately
