@@ -363,7 +363,7 @@ section {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&q=80');
+  background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -2678,4 +2678,45 @@ body.nav-active {
 .mobile-nav {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+}
+
+/* Update scroll lock styles */
+body.nav-active {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: none;
+}
+
+.mobile-nav {
+  /* ...existing styles... */
+  height: calc(100vh - 73px);
+  overscroll-behavior: contain;
+  position: fixed;
+  top: 73px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-nav.active {
+  /* ...existing styles... */
+  position: fixed;
+  overflow-y: auto;
+}
+
+/* Hide listen-now-btn in mobile nav */
+@media (max-width: 768px) {
+    .mobile-nav .listen-now-btn {
+        display: none;
+    }
+    
+    .mobile-nav .mobile-listen {
+        display: none; /* Hide mobile version of listen button */
+    }
 }
