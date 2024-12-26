@@ -346,19 +346,17 @@ section {
   background: var(--dark-bg);
 }
 
-/* Hero Section */
+/* Hero Section Improvements */
 .hero {
-  min-height: 100vh;
-  padding-top: calc(73px + 4rem);
-  padding-bottom: 6rem; /* Increased bottom padding */
-  display: flex;
-  align-items: flex-start; /* Changed from center to flex-start */
-  padding: 2rem;
-  text-align: center;
-  position: relative;
-  overflow: visible; /* Changed from hidden to visible */
-  margin-top: 0;
-  isolation: isolate;
+    min-height: 100vh;
+    padding: calc(73px + 4rem) 2rem 6rem;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: visible;
+    margin: 0;
+    isolation: isolate;
 }
 
 .hero::before {
@@ -387,20 +385,23 @@ section {
 }
 
 .hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 1200px;
-  width: 100%;
-  margin-top: 4rem; /* Added margin top */
-  animation: fadeIn 1.2s ease-out;
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
 }
 
 .station-title {
     font-size: clamp(2.5rem, 8vw, 5rem);
     font-weight: 800;
-    margin-bottom: 3rem; /* Increased from 2.5rem */
-    line-height: 1.3; /* Increased from 1.2 */
-    padding: 0.5rem 1rem 1.5rem; /* Added bottom padding */
+    line-height: 1.2;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     background: linear-gradient(to right, 
         #ffffff 0%, 
@@ -413,27 +414,6 @@ section {
     letter-spacing: -1px;
     position: relative;
     animation: titleReveal 1.5s ease-out;
-    max-width: 100%;
-    word-wrap: break-word;
-    display: block; /* Added display block */
-}
-
-@media (max-width: 768px) {
-    .station-title {
-        font-size: clamp(2rem, 6vw, 3rem);
-        margin-bottom: 2.5rem;
-        padding: 0.5rem 0.5rem 1rem;
-        line-height: 1.4;
-    }
-
-    .hero {
-        padding-top: calc(73px + 3rem);
-        padding-bottom: 4rem;
-    }
-
-    .hero-content {
-        margin-top: 2rem;
-    }
 }
 
 .station-title::after {
@@ -454,17 +434,19 @@ section {
 }
 
 .station-genres {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 4rem;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  animation: fadeInUp 1s ease-out 0.5s both;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 1rem 0 3rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    max-width: 600px;
+    animation: fadeInUp 1s ease-out 0.5s both;
 }
 
 .station-genres span {
@@ -524,30 +506,69 @@ section {
 }
 
 .player-container {
-  background: rgba(15, 15, 30, 0.8);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-  animation: fadeInUp 1s ease-out 0.8s both;
-  transform-style: preserve-3d;
+    background: rgba(15, 15, 30, 0.8);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2.5rem;
+    max-width: 650px;
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 1s ease-out 0.8s both;
+    transform-style: preserve-3d;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 50px rgba(255, 45, 85, 0.1);
 }
 
-.player-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at top right,
-    rgba(255, 45, 85, 0.2),
-    transparent 60%
-  );
-  pointer-events: none;
-  opacity: 0.8;
+.on-air {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.on-air-dot {
+    width: 8px;
+    height: 8px;
+    background: #FF2D55;
+    border-radius: 50%;
+    position: relative;
+    animation: pulse 2s infinite;
+}
+
+.on-air-dot::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: rgba(255, 45, 85, 0.4);
+    animation: ripple 2s infinite;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.track-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 @keyframes titleReveal {
@@ -661,12 +682,11 @@ section {
 }
 
 .controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-top: 2rem;
-  padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 0;
 }
 
 .play-btn {
@@ -768,6 +788,34 @@ section {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: calc(73px + 2rem) 1rem 4rem;
+  }
+
+  .station-genres {
+    font-size: 0.9rem;
+    gap: 1.5rem;
+    letter-spacing: 3px;
+    margin: 0.5rem 0 2.5rem;
+  }
+
+  .player-container {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .volume {
+    justify-content: center;
+    padding: 0.5rem 0;
   }
 }
 
@@ -2331,10 +2379,10 @@ html {
 
 .mobile-header .nav-container {
   display: flex;
-  justify-content: center; /* Center the logo */
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  height: 100%;
+  padding: 0 2rem;
+  height: 73px; /* Make height explicit */
 }
 
 .mobile-header .logo {
@@ -2347,9 +2395,16 @@ html {
   filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.3));
 }
 
-/* Update mobile nav toggle position */
+/* Update mobile nav toggle for better centering */
 .mobile-nav-toggle {
-  z-index: 1001; /* Ensure it's above the header */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: auto 0; /* This ensures vertical centering */
+  padding: 0;
 }
 
 @media (max-width: 768px) {
