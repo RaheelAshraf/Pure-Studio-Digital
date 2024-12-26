@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Add these favicon links -->
-    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" sizes="32x32">
-    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" sizes="16x16">
-    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036">
+    <!-- Update favicon links -->
+    <link rel="icon" type="image/png" href="assets/images/LogoPureSoul.webp" sizes="32x32">
+    <link rel="icon" type="image/png" href="assets/images/LogoPureSoul.webp" sizes="16x16">
+    <link rel="apple-touch-icon" href="assets/images/LogoPureSoul.webp">
     
     <!-- Remove old favicon link -->
     <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
@@ -21,8 +21,11 @@
     <link rel="preconnect" href="https://stream.zeno.fm">
     <link rel="preconnect" href="https://stream4.rcast.net">
     
-    <!-- Add preload for critical images -->
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75" fetchpriority="high">
+    <!-- Remove hero image preload -->
+    <!-- <link rel="preload" as="image" href="assets/images/hero.webp" fetchpriority="high"> -->
+    
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="assets/images/LogoPureSoul.webp" fetchpriority="high">
 </head>
 <body>
     <!-- Mobile Navigation Toggle -->
@@ -34,7 +37,7 @@
     <div class="mobile-nav">
         <nav class="mobile-nav-content">
             <div class="mobile-nav-header">
-                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" 
+                <img src="assets/images/LogoPureSoul.webp" 
                      alt="PureSoul Digital"
                      width="60" 
                      height="60">
@@ -61,7 +64,7 @@
     <header class="mobile-header">
         <div class="nav-container">
             <a href="/" class="logo">
-                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" 
+                <img src="assets/images/LogoPureSoul.webp" 
                      alt="PureSoul Digital"
                      width="40" 
                      height="40">
@@ -73,11 +76,12 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
-                <img src="https://firebasestorage.googleapis.com/v0/b/test-hosting-3fc1c.appspot.com/o/WhatsApp%20Image%202024-12-22%20at%208.19.09%20PM.jpeg?alt=media&token=b7238105-275b-4a1d-b43f-18e08ac11036" 
+                <img src="assets/images/LogoPureSoul.webp" 
                      alt="PureSoul Digital"
                      width="48" 
                      height="48"
-                     loading="eager">
+                     loading="eager"
+                     fetchpriority="high">
             </a>
             
             <div class="nav-menu">
@@ -86,7 +90,7 @@
                     <a href="#advertise-section" class="nav-link">Stations</a>
                     <a href="#contact" class="nav-link">Contact</a>
                 </nav>
-                <a href="#" class="listen-now-btn" id="navListenBtn" data-stream="https://ice5.somafm.com/seventies-128-mp3">
+                <a href="#" class="listen-now-btn" id="navListenBtn" data-stream="https://s50.radiolize.com/radio/8130/radio.mp3">
                     <i class="fas fa-play"></i>
                     Listen Live
                 </a>
@@ -115,9 +119,7 @@
                 <div class="player-box">
                     <div class="now-playing">NOW PLAYING</div>
                     <div class="track-container">
-                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=160&q=75" 
-                             srcset="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=160&q=75 1x,
-                                     https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=320&q=75 2x"
+                        <img src="assets/images/LogoPureSoul.webp" 
                              alt="Track Art"
                              width="80"
                              height="80"
@@ -133,7 +135,7 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="play-btn main-stream" data-stream="https://ice5.somafm.com/seventies-128-mp3">
+                    <button class="play-btn main-stream" data-stream="https://s50.radiolize.com/radio/8130/radio.mp3">
                         <i class="fas fa-play"></i>
                         Start Listening
                     </button>
@@ -158,13 +160,12 @@
             <div class="stations-grid">
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=400&q=75" 
-                             srcset="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=400&q=75 1x,
-                                     https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75 2x"
+                        <img src="assets/images/Gospel.webp" 
                              alt="Gospel Vibes"
                              width="400"
                              height="225"
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </div>
                     <div class="station-content">
                         <div class="station-header">
@@ -183,7 +184,7 @@
                             </span>
                         </div>
                         <div class="station-actions">
-                            <button class="featured-btn play-btn" data-stream="https://stream.zeno.fm/w8d706c69ehvv">
+                            <button class="featured-btn play-btn" data-stream="https://stream3.rcast.net/72170">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -193,9 +194,7 @@
 
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=400&q=75" 
-                             srcset="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=400&q=75 1x,
-                                     https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=800&q=75 2x"
+                        <img src="assets/images/JazzVibe.webp" 
                              alt="Jazz Lounge"
                              width="400"
                              height="225"
@@ -228,9 +227,7 @@
 
                 <div class="station-card">
                     <div class="station-image">
-                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=400&q=75" 
-                             srcset="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=400&q=75 1x,
-                                     https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&w=800&q=75 2x"
+                        <img src="assets/images/Reggae.webp" 
                              alt="Conscious Reggae"
                              width="400"
                              height="225"
@@ -306,7 +303,7 @@
                     <div class="contact-info">
                         <h3>Email Us</h3>
                         <div class="contact-details">
-                            <p class="contact-value">puresouldigital1@gmail.com</p>
+                            <p class="contact-value">contact@puresouldigital.com</p>
                             <div class="contact-schedule">
                                 <span class="schedule-dot"></span>
                                 <span>24/7 Available</span>
@@ -329,12 +326,6 @@
                         <h3>Studio Location</h3>
                         <div class="contact-details">
                             <p class="contact-value">New York City</p>
-                            <div class="contact-schedule">
-                                <span class="schedule-dot"></span>
-                                <span>Professional Visits</span>
-                                <span class="schedule-dot"></span>
-                                <span>By Appointment</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -362,7 +353,7 @@
                     </div>
                     <span>Twitter</span>
                 </a>
-                <a href="#" class="social-link youtube">
+                <a href="https://youtube.com/@puresouldigital" target="_blank" class="social-link youtube">
                     <div class="social-icon">
                         <i class="fab fa-youtube"></i>
                     </div>
@@ -402,7 +393,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 PureSoul Digital. All rights reserved.</p>
+                <p>&copy; 2025 PureSoul Digital. All rights reserved.</p>
                 <div class="footer-social">
                     <a href="https://www.facebook.com/profile.php?id=61571320880049" aria-label="Facebook" target="_blank">
                         <i class="fab fa-facebook-f"></i>
@@ -413,7 +404,7 @@
                     <a href="https://x.com/puresouldigital" aria-label="X (Twitter)" target="_blank">
                         <i class="fa-brands fa-x-twitter"></i>
                     </a>
-                    <a href="#" aria-label="YouTube" onclick="return false;">
+                    <a href="https://youtube.com/@puresouldigital" aria-label="YouTube" target="_blank">
                         <i class="fab fa-youtube"></i>
                     </a>
                 </div>

@@ -40,6 +40,7 @@ a {
 img {
   max-width: 100%;
   height: auto;
+  aspect-ratio: attr(width) / attr(height);
 }
 
 .container {
@@ -356,20 +357,18 @@ section {
     overflow: visible;
     margin: 0;
     isolation: isolate;
+    z-index: 1; /* Ensure proper stacking context */
 }
 
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&w=800&q=75');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, 
+    rgba(15, 15, 30, 0.95) 0%,
+    rgba(26, 26, 58, 0.95) 100%
+  );
   z-index: -2;
-  transform: scale(1.1);
-  filter: brightness(0.3) saturate(1.2);
-  animation: subtle-zoom 30s infinite alternate;
 }
 
 .hero::after {
@@ -1042,6 +1041,8 @@ section {
   width: 100%;
   padding-top: 56.25%;
   overflow: hidden;
+  background: #1a1a3a; /* Add placeholder color */
+  aspect-ratio: 16/9; /* Maintain aspect ratio while loading */
 }
 
 .station-image img {
@@ -2901,4 +2902,35 @@ body.nav-active {
 
 .mobile-nav.active {
     display: block;
+}
+
+/* Add loading animation */
+@keyframes imageLoad {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+img[loading] {
+  opacity: 0;
+  animation: imageLoad 0.3s ease forwards;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding-top: calc(80px + 2rem); /* Adjust for mobile header height */
+        min-height: calc(100vh - 80px); /* Account for mobile header */
+    }
+    
+    /* Fix mobile nav stacking context */
+    .mobile-nav {
+        z-index: 999;
+    }
+    
+    .mobile-header {
+        z-index: 1000;
+    }
+    
+    .mobile-nav-toggle {
+        z-index: 1001;
+    }
 }
