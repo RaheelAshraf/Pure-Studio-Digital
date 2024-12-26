@@ -1,41 +1,70 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Nav Implementation
+    // Mobile Navigation Elements
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
+    const navMenu = document.querySelector('.nav-menu');
     const body = document.body;
 
+    // Toggle Mobile Navigation
     function toggleMobileNav() {
         const isOpen = mobileNav.classList.toggle('active');
         body.classList.toggle('nav-active', isOpen);
+        
+        // Toggle both mobile nav and nav menu
+        navMenu.classList.toggle('active', isOpen);
+        
+        // Toggle icon
         const icon = mobileNavToggle.querySelector('i');
-        icon.classList.toggle('fa-bars');
-        icon.classList.toggle('fa-times');
+        icon.classList.toggle('fa-bars', !isOpen);
+        icon.classList.toggle('fa-times', isOpen);
     }
 
     mobileNavToggle.addEventListener('click', toggleMobileNav);
 
-    // Handle mobile navigation clicks
+    // Close mobile nav when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!navMenu.contains(e.target) && 
+            !mobileNav.contains(e.target) && 
+            !mobileNavToggle.contains(e.target)) {
+            
+            if (mobileNav.classList.contains('active')) {
+                mobileNav.classList.remove('active');
+                navMenu.classList.remove('active');
+                body.classList.remove('nav-active');
+                mobileNavToggle.querySelector('i').classList.add('fa-bars');
+                mobileNavToggle.querySelector('i').classList.remove('fa-times');
+            }
+        }
+    });
+
+    // Close mobile nav when clicking links
+    document.querySelectorAll('.nav-link, .mobile-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            navMenu.classList.remove('active');
+            body.classList.remove('nav-active');
+            mobileNavToggle.querySelector('i').classList.add('fa-bars');
+            mobileNavToggle.querySelector('i').classList.remove('fa-times');
+        });
+    });
+
+    // Handle mobile navigation clicks for smooth scrolling
     document.querySelectorAll('.mobile-nav a').forEach(link => {
         link.addEventListener('click', (e) => {
             const href = link.getAttribute('href');
             
-            // Skip if href is empty or just "#"
             if (!href || href === '#') return;
             
-            // Handle special cases
             if (href === '/') {
                 e.preventDefault();
-                toggleMobileNav();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
             
-            // Handle anchor links
             if (href.startsWith('#') && href.length > 1) {
                 e.preventDefault();
                 const targetElement = document.querySelector(href);
                 if (targetElement) {
-                    toggleMobileNav();
                     setTimeout(() => {
                         const headerOffset = 60;
                         const elementPosition = targetElement.getBoundingClientRect().top;
