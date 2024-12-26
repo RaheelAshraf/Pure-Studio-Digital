@@ -1362,70 +1362,89 @@ section {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    padding: 1.75rem;
+    gap: 2rem;
+    padding: 1.5rem;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 24px;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     overflow: hidden;
-    z-index: 1;
-}
-
-.social-link::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at 100% 100%,
-        rgba(255, 255, 255, 0.08) 0%,
-        transparent 50%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
 }
 
 .social-icon {
     position: relative;
-    width: 56px;
-    height: 56px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    flex-shrink: 0;
 }
 
-.social-icon::after {
+.social-icon::before {
     content: '';
     position: absolute;
     inset: -1px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    border-radius: 50%;
+    padding: 1px;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 }
 
 .social-icon i {
     font-size: 1.5rem;
-    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.4s ease;
 }
 
-.social-info {
-    flex: 1;
-}
-
-.social-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.8));
+/* Social platform specific styles */
+.social-link.facebook .social-icon i { color: #1877f2; }
+.social-link.instagram .social-icon i { 
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+.social-link.twitter .social-icon i { color: #1DA1F2; }
+.social-link.youtube .social-icon i { color: #FF0000; }
+
+/* Enhanced hover effects */
+.social-link:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(255, 45, 85, 0.15);
+}
+
+.social-link:hover .social-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.social-link:hover .social-icon i {
+    transform: scale(1.2);
+}
+
+/* Platform specific hover effects */
+.social-link.facebook:hover {
+    background: rgba(24, 119, 242, 0.1);
+}
+
+.social-link.instagram:hover {
+    background: rgba(225, 48, 108, 0.1);
+}
+
+.social-link.twitter:hover {
+    background: rgba(29, 161, 242, 0.1);
+}
+
+.social-link.youtube:hover {
+    background: rgba(255, 0, 0, 0.1);
 }
 
 .follower-count {
@@ -1534,12 +1553,13 @@ section {
     }
     
     .social-link {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        gap: 1.5rem;
     }
     
     .social-icon {
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
     }
     
     .social-icon i {
@@ -1829,30 +1849,49 @@ section {
 }
 
 .footer-social a {
-  width: 42px;
-  height: 42px;
+  position: relative;
+  width: 45px;
+  height: 45px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.footer-social a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 45, 85, 0.2), rgba(255, 149, 0, 0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .footer-social a:hover {
-  transform: translateY(-3px);
-  background: linear-gradient(135deg, rgba(255, 45, 85, 0.1), rgba(255, 149, 0, 0.1));
+  transform: translateY(-5px);
   border-color: rgba(255, 45, 85, 0.3);
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.2),
+    0 0 15px rgba(255, 45, 85, 0.15);
+}
+
+.footer-social a:hover::before {
+  opacity: 1;
 }
 
 .footer-social i {
   font-size: 1.2rem;
-  background: linear-gradient(135deg, #FF2D55, #FF9500);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  position: relative;
+  z-index: 1;
   transition: all 0.3s ease;
+}
+
+.footer-social a:hover i {
+  transform: scale(1.2);
 }
 
 @media (max-width: 992px) {
