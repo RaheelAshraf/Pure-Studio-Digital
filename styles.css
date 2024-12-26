@@ -2719,3 +2719,100 @@ body.nav-active {
         display: none; /* Hide mobile version of listen button */
     }
 }
+
+/* Enhanced Mobile Navigation Styles */
+.mobile-nav {
+    padding: 0;
+    background: linear-gradient(180deg, rgba(15, 15, 30, 0.98) 0%, rgba(26, 26, 58, 0.98) 100%);
+}
+
+.mobile-nav-content {
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 1.5rem; /* Increased padding */
+    height: 100vh;
+}
+
+.mobile-nav-header {
+    text-align: center;
+    margin-bottom: 4rem; /* Increased margin */
+    padding: 1rem;
+}
+
+.mobile-nav-header img {
+    width: 80px; /* Increased size */
+    height: 80px; /* Increased size */
+    border-radius: 24px;
+    margin-bottom: 1.5rem; /* Increased margin */
+    box-shadow: 0 8px 32px rgba(255, 45, 85, 0.2);
+}
+
+.mobile-nav-header h3 {
+    font-size: 1.8rem; /* Increased size */
+    font-weight: 600;
+    background: linear-gradient(135deg, #ffffff, #e6e6e6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Increased gap */
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem; /* Increased padding */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-nav-item i {
+    font-size: 1.4rem; /* Increased size */
+    color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-item span {
+    font-size: 1.2rem; /* Increased size */
+    letter-spacing: 0.3px;
+}
+
+/* Enhanced Mobile Toggle Button */
+.mobile-nav-toggle {
+    background: rgba(255, 45, 85, 0.1);
+    border: 1px solid rgba(255, 45, 85, 0.2);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    color: var(--primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav-toggle:hover {
+    background: rgba(255, 45, 85, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.1),
+        0 4px 8px rgba(255, 45, 85, 0.1);
+}
+
+.mobile-nav-toggle:active {
+    transform: translateY(0);
+}
+
+/* Mobile Header Enhancement */
+.mobile-header {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
