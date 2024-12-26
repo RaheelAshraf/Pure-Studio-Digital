@@ -2684,40 +2684,27 @@ body.nav-active {
   overflow: hidden;
   position: fixed;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  inset: 0;
+  overflow: hidden !important;
   touch-action: none;
-  overscroll-behavior: none;
   -webkit-overflow-scrolling: none;
+  overscroll-behavior: none;
+  padding-right: var(--scrollbar-width, 0px); /* Prevent layout shift */
 }
 
 .mobile-nav {
-  /* ...existing styles... */
-  height: calc(100vh - 73px);
-  overscroll-behavior: contain;
   position: fixed;
-  top: 73px;
-  bottom: 0;
+  top: 80px;
   left: 0;
   right: 0;
+  bottom: 0;
+  height: calc(100vh - 80px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.mobile-nav.active {
-  /* ...existing styles... */
-  position: fixed;
-  overflow-y: auto;
-}
-
-/* Hide listen-now-btn in mobile nav */
-@media (max-width: 768px) {
-    .mobile-nav .listen-now-btn {
-        display: none;
-    }
-    
-    .mobile-nav .mobile-listen {
-        display: none; /* Hide mobile version of listen button */
-    }
+  overscroll-behavior: contain;
+  display: none;
+  padding-bottom: 80px; /* Add extra padding at bottom */
 }
 
 /* Enhanced Mobile Navigation Styles */
@@ -2886,4 +2873,32 @@ body.nav-active {
     .mobile-nav {
         top: 80px;
     }
+}
+
+/* Add these new styles for scroll locking */
+body.nav-active {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+    overscroll-behavior: none;
+}
+
+.mobile-nav {
+    position: fixed;
+    top: 80px;  /* Match header height */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100% - 80px);  /* Subtract header height */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    display: none;
+}
+
+.mobile-nav.active {
+    display: block;
 }

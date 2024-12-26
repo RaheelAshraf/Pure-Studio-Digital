@@ -5,18 +5,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const navMenu = document.querySelector('.nav-menu');
     const body = document.body;
 
+    // Store the scroll position when opening nav
+    let scrollPosition = 0;
+
+    // Calculate scrollbar width
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+
     // Toggle Mobile Navigation
     function toggleMobileNav() {
         const isOpen = mobileNav.classList.toggle('active');
-        body.classList.toggle('nav-active', isOpen);
         
-        // Toggle both mobile nav and nav menu
+        if (isOpen) {
+            // Store current scroll position
+            scrollPosition = window.pageYOffset;
+            // Add scroll lock
+            body.classList.add('nav-active');
+            // Apply negative top margin to maintain visual position
+            body.style.top = `-${scrollPosition}px`;
+            // Prevent touch events on body
+            body.style.touchAction = 'none';
+            
+            // Add touch event listeners to prevent scrolling
+            document.addEventListener('touchmove', preventScroll, { passive: false });
+            document.addEventListener('wheel', preventScroll, { passive: false });
+        } else {
+            // Remove scroll lock
+            body.classList.remove('nav-active');
+            // Reset body position
+            body.style.top = '';
+            body.style.touchAction = '';
+            // Restore scroll position
+            window.scrollTo(0, scrollPosition);
+            
+            // Remove touch event listeners
+            document.removeEventListener('touchmove', preventScroll);
+            document.removeEventListener('wheel', preventScroll);
+        }
+        
         navMenu.classList.toggle('active', isOpen);
         
-        // Toggle icon
         const icon = mobileNavToggle.querySelector('i');
         icon.classList.toggle('fa-bars', !isOpen);
         icon.classList.toggle('fa-times', isOpen);
+    }
+
+    // Prevent scroll/touch events
+    function preventScroll(e) {
+        e.preventDefault();
     }
 
     mobileNavToggle.addEventListener('click', toggleMobileNav);
@@ -26,25 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!navMenu.contains(e.target) && 
             !mobileNav.contains(e.target) && 
             !mobileNavToggle.contains(e.target)) {
-            
-            if (mobileNav.classList.contains('active')) {
-                mobileNav.classList.remove('active');
-                navMenu.classList.remove('active');
-                body.classList.remove('nav-active');
-                mobileNavToggle.querySelector('i').classList.add('fa-bars');
-                mobileNavToggle.querySelector('i').classList.remove('fa-times');
-            }
+            closeMobileNav();
         }
     });
 
     // Close mobile nav when clicking links
     document.querySelectorAll('.nav-link, .mobile-nav a').forEach(link => {
         link.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            navMenu.classList.remove('active');
-            body.classList.remove('nav-active');
-            mobileNavToggle.querySelector('i').classList.add('fa-bars');
-            mobileNavToggle.querySelector('i').classList.remove('fa-times');
+            closeMobileNav();
         });
     });
 
@@ -349,4 +374,23 @@ document.addEventListener('DOMContentLoaded', () => {
             updateVolumeIcon(isNotMuted ? audioManager.lastVolume : 0);
         });
     });
+
+    // Update close handlers
+    function closeMobileNav() {
+        if (mobileNav.classList.contains('active')) {
+            mobileNav.classList.remove('active');
+            navMenu.classList.remove('active');
+            body.classList.remove('nav-active');
+            body.style.top = '';
+            body.style.touchAction = '';
+            window.scrollTo(0, scrollPosition);
+            
+            // Remove touch event listeners
+            document.removeEventListener('touchmove', preventScroll);
+            document.removeEventListener('wheel', preventScroll);
+            
+            mobileNavToggle.querySelector('i').classList.add('fa-bars');
+            mobileNavToggle.querySelector('i').classList.remove('fa-times');
+        }
+    }
 });
