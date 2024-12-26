@@ -2665,3 +2665,17 @@ html {
         overflow: hidden;
     }
 }
+
+/* Add scroll lock class */
+body.nav-active {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Adjust mobile nav styles to handle scrolling */
+.mobile-nav {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+}
