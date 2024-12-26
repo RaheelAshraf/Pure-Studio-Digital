@@ -2094,7 +2094,7 @@ section {
 
 @media (max-width: 768px) {
   .mobile-nav {
-    top: 73px;
+    top: 80px;
   }
 
   .mobile-nav ul {
@@ -2815,4 +2815,75 @@ body.nav-active {
 /* Mobile Header Enhancement */
 .mobile-header {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Mobile Header Styles */
+.mobile-header {
+    background: linear-gradient(180deg, rgba(15, 15, 30, 0.98) 0%, rgba(26, 26, 58, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 45, 85, 0.1);
+    box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.2),
+        0 1px 0 rgba(255, 255, 255, 0.03);
+    height: 80px;
+}
+
+.mobile-header .nav-container {
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.mobile-header .logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    z-index: 2;
+}
+
+.mobile-header .logo img {
+    height: 48px;
+    width: auto;
+    border-radius: 12px;
+    filter: drop-shadow(0 4px 12px rgba(255, 45, 85, 0.3));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-header .logo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 45, 85, 0.15), transparent 70%);
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-header .logo:hover::after {
+    opacity: 1;
+}
+
+.mobile-header .logo:hover img {
+    transform: scale(1.05);
+    filter: drop-shadow(0 8px 20px rgba(255, 45, 85, 0.4));
+}
+
+/* Update mobile header positioning */
+@media (max-width: 768px) {
+    .mobile-header {
+        padding: 0;
+    }
+
+    .hero {
+        padding-top: calc(80px + 2rem);
+    }
+
+    .mobile-nav {
+        top: 80px;
+    }
 }
