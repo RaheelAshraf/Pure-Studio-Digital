@@ -2322,8 +2322,7 @@ html {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
-  padding: 1rem 2rem;
+  z-index: 999;
   background: rgba(15, 15, 30, 0.98);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -2332,8 +2331,10 @@ html {
 
 .mobile-header .nav-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the logo */
   align-items: center;
+  padding: 1rem 2rem;
+  height: 100%;
 }
 
 .mobile-header .logo {
@@ -2344,6 +2345,35 @@ html {
   height: 40px;
   width: auto;
   filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.3));
+}
+
+/* Update mobile nav toggle position */
+.mobile-nav-toggle {
+  z-index: 1001; /* Ensure it's above the header */
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none;
+  }
+  
+  .mobile-header {
+    display: block;
+  }
+
+  .mobile-nav-toggle {
+    display: flex;
+    top: 1.2rem; /* Adjust position to align with header */
+  }
+
+  .mobile-nav {
+    top: 73px; /* Start below mobile header */
+    margin-top: 0;
+  }
+
+  .hero {
+    padding-top: calc(73px + 2rem); /* Adjust hero section padding */
+  }
 }
 
 /* Update mobile nav styles */
