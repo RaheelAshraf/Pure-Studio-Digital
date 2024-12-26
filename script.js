@@ -87,8 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function setActiveLink(hash) {
         navLinks.forEach(link => {
             link.classList.remove('active');
-            if ((hash === '' && link.getAttribute('href') === '/') || 
-                (hash && link.getAttribute('href') === hash)) {
+            const href = link.getAttribute('href');
+            // Check if we should highlight home link
+            if (hash === '' && (href === '/' || href === 'index.html')) {
+                link.classList.add('active');
+            }
+            // Check for section links
+            else if (hash && href.includes(hash)) {
                 link.classList.add('active');
             }
         });
@@ -109,23 +114,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle scroll to update active state
     function highlightNavOnScroll() {
-        const scrollPos = window.scrollY + 100; // Offset for better trigger point
+        const scrollPos = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
 
-        // Check if we're at the top of the page
-        if (scrollPos < 100) {
+        // If at the top of the page (with some buffer)
+        if (scrollPos < windowHeight * 0.3) {
             setActiveLink('');
             return;
         }
 
-        // Otherwise check which section we're in
+        // If at the bottom of the page
+        if (scrollPos + windowHeight >= documentHeight - 100) {
+            const lastSection = sections[sections.length - 1];
+            if (lastSection) {
+                setActiveLink('#' + lastSection.getAttribute('id'));
+            }
+            return;
+        }
+
+        // Check which section we're in
+        let currentSection = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
+            const sectionTop = section.offsetTop - 100;
+            const sectionBottom = sectionTop + section.offsetHeight;
             
-            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                setActiveLink('#' + section.getAttribute('id'));
+            if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
+                currentSection = '#' + section.getAttribute('id');
             }
         });
+
+        setActiveLink(currentSection);
     }
 
     // Add scroll event listener

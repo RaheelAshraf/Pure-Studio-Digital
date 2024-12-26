@@ -134,13 +134,12 @@ img {
 }
 
 .nav-link.active {
-  color: #FF2D55;
-  font-weight: 600;
+  color: var(--primary);
+  background: rgba(255, 45, 85, 0.1);
 }
 
 .nav-link.active::before {
   opacity: 1;
-  background: rgba(255, 45, 85, 0.15);
 }
 
 .listen-now-btn {
