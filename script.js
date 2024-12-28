@@ -257,9 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     class AudioBufferManager {
         constructor() {
-            // Initialize audio immediately
             this.audio = new Audio();
-            this.audio.preload = "auto";
+            this.audio.preload = "none"; // Start with no preload
             this.audio.crossOrigin = "anonymous";
             this.isPlaying = false;
             this.activeButton = null;
@@ -308,6 +307,21 @@ document.addEventListener('DOMContentLoaded', () => {
             this.audio.addEventListener('canplay', () => {
                 this.handleLoading(false);
             });
+
+            // Add interaction observer
+            this.setupInteractionObserver();
+        }
+
+        setupInteractionObserver() {
+            // Enable preloading after first user interaction
+            const enablePreload = () => {
+                this.audio.preload = "auto";
+                document.removeEventListener('click', enablePreload);
+                document.removeEventListener('touchstart', enablePreload);
+            };
+
+            document.addEventListener('click', enablePreload, { once: true });
+            document.addEventListener('touchstart', enablePreload, { once: true });
         }
 
         clearCurrentStream() {
@@ -360,12 +374,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         togglePlayback(button) {
-            if (!button?.dataset.stream) {
-                console.error('No stream URL provided');
-                return;
-            }
+            if (!button?.dataset.stream) return;
 
             try {
+                // Enable preload when user attempts playback
+                this.audio.preload = "auto";
+                
                 // If same button is clicked while playing, just pause and return
                 if (this.activeButton === button && this.isPlaying) {
                     this.pause();

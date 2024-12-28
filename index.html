@@ -4,38 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PureSoul Digital - Soul Music Radio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Update favicon links -->
+    <!-- Critical Resources -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" type="module" defer></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" 
+          rel="stylesheet">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="LogoPureSoul.webp" sizes="32x32">
     <link rel="icon" type="image/png" href="LogoPureSoul.webp" sizes="16x16">
     <link rel="apple-touch-icon" href="LogoPureSoul.webp">
     
-    <!-- Remove old favicon link -->
-    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
+    <!-- Preconnect for Audio Streams -->
+    <link rel="preconnect" href="https://ice5.somafm.com" crossorigin>
+    <link rel="preconnect" href="https://stream.zeno.fm" crossorigin>
+    <link rel="preconnect" href="https://stream4.rcast.net" crossorigin>
     
-    <!-- Add these lines for faster audio loading -->
-    <link rel="preconnect" href="https://ice5.somafm.com">
-    <link rel="preconnect" href="https://stream.zeno.fm">
-    <link rel="preconnect" href="https://stream4.rcast.net">
-    
-    <!-- Remove hero image preload -->
-    <!-- <link rel="preload" as="image" href="assets/images/hero.webp" fetchpriority="high"> -->
-    
-    <!-- Preload critical images -->
-    <link rel="preload" as="image" href="LogoPureSoul.webp" fetchpriority="high">
-
-    <!-- Add to head section -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="styles.css">
-    <link rel="preload" as="script" href="script.js">
-
-    <!-- Add to head section -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta Tags -->
     <meta name="description" content="PureSoul Digital - Your premier online radio station for soulful music">
     <meta name="keywords" content="radio, music, soul, digital radio, online radio">
     <meta name="author" content="PureSoul Digital">
@@ -65,7 +58,9 @@
                 <img src="LogoPureSoul.webp" 
                      alt="PureSoul Digital"
                      width="60" 
-                     height="60">
+                     height="60"
+                     fetchpriority="high"
+                     decoding="async">
                 <h3>PureSoul Digital</h3>
             </div>
             <div class="mobile-nav-links">
@@ -437,7 +432,6 @@
         </div>
     </footer>
 
-    <script src="script.js" type="module"></script>
     <script>
         // Prevent default scroll behavior and reset to top
         window.addEventListener('load', function() {
@@ -451,3 +445,4 @@
     </script>
 </body>
 </html>
+
