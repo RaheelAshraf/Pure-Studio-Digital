@@ -138,15 +138,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle click events on nav links
-    navLinks.forEach(link => {
+    // Create Intersection Observer for sections
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -100px 0px',
+        threshold: 0.1
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const sectionId = entry.target.getAttribute('id');
+                setActiveLink('#' + sectionId);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all sections
+    document.querySelectorAll('section[id]').forEach(section => {
+        sectionObserver.observe(section);
+    });
+
+    // Update navigation click handlers with better error handling
+    document.querySelectorAll('.nav-link, .mobile-nav a').forEach(link => {
         link.addEventListener('click', (e) => {
-            if (link.getAttribute('href') === '/') {
+            try {
                 e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setActiveLink('');
-            } else {
-                setActiveLink(link.getAttribute('href'));
+                const href = link.getAttribute('href');
+                
+                if (!href) return;
+
+                // Handle home link
+                if (href === '/' || href === 'index.html') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                
+                // Handle section links
+                if (href.startsWith('#')) {
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        // Close mobile nav if open
+                        closeMobileNav();
+                        
+                        const headerOffset = 80;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Navigation error:', error);
             }
         });
     });
@@ -186,8 +232,21 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveLink(currentSection);
     }
 
-    // Add scroll event listener
-    window.addEventListener('scroll', highlightNavOnScroll);
+    // Add debouncing for scroll events
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Update scroll handler with debouncing
+    window.addEventListener('scroll', debounce(highlightNavOnScroll, 100));
     
     // Set initial active state
     if (window.location.hash) {
@@ -228,6 +287,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Add abort controller for loading states
             this.currentLoadingController = null;
+
+            // Add error handling and loading states
+            this.errorTimeout = null;
+            this.loadingTimeout = null;
+            
+            // Add event listeners for better error handling
+            this.audio.addEventListener('error', (e) => {
+                this.handleAudioError(e);
+            });
+
+            this.audio.addEventListener('waiting', () => {
+                this.handleLoading(true);
+            });
+
+            this.audio.addEventListener('playing', () => {
+                this.handleLoading(false);
+            });
+
+            this.audio.addEventListener('canplay', () => {
+                this.handleLoading(false);
+            });
         }
 
         clearCurrentStream() {
@@ -280,43 +360,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         togglePlayback(button) {
-            if (!button?.dataset.stream) return;
-
-            // If same button is clicked while playing, just pause and return
-            if (this.activeButton === button && this.isPlaying) {
-                this.pause();
+            if (!button?.dataset.stream) {
+                console.error('No stream URL provided');
                 return;
             }
 
-            // If different button clicked or not playing
-            if (this.activeButton !== button || !this.isPlaying) {
-                // Clear any existing stream if switching to a new button
-                if (this.activeButton !== button) {
-                    this.clearCurrentStream();
+            try {
+                // If same button is clicked while playing, just pause and return
+                if (this.activeButton === button && this.isPlaying) {
+                    this.pause();
+                    return;
                 }
 
-                // Create new abort controller for this stream
-                this.currentLoadingController = new AbortController();
-                
-                // Show loading state immediately
-                this.setLoadingState(true);
-                this.activeButton = button;
-                
-                // Start new stream only if not already playing
-                if (!this.isPlaying) {
-                    const streamUrl = button.dataset.stream;
-                    this.audio.src = streamUrl;
-                    this.audio.load();
-                    this.audio.play().then(() => {
-                        this.isPlaying = true;
-                        this.updateButtonState(button, true);
-                    }).catch(error => {
-                        if (error.name !== 'AbortError') {
-                            console.error('Playback failed:', error);
-                            this.clearCurrentStream();
-                        }
-                    });
+                // If different button clicked or not playing
+                if (this.activeButton !== button || !this.isPlaying) {
+                    // Clear any existing stream if switching to a new button
+                    if (this.activeButton !== button) {
+                        this.clearCurrentStream();
+                    }
+
+                    // Create new abort controller for this stream
+                    this.currentLoadingController = new AbortController();
+                    
+                    // Show loading state immediately
+                    this.handleLoading(true);
+                    this.activeButton = button;
+                    
+                    // Start new stream only if not already playing
+                    if (!this.isPlaying) {
+                        const streamUrl = button.dataset.stream;
+                        this.audio.src = streamUrl;
+                        this.audio.load();
+
+                        // Add timeout for slow connections
+                        const playbackTimeout = setTimeout(() => {
+                            if (this.isLoading) {
+                                this.handleAudioError(new Error('Playback timeout'));
+                            }
+                        }, 10000); // 10 second timeout
+
+                        this.audio.play()
+                            .then(() => {
+                                clearTimeout(playbackTimeout);
+                                this.isPlaying = true;
+                                this.updateButtonState(button, true);
+                            })
+                            .catch(error => {
+                                clearTimeout(playbackTimeout);
+                                if (error.name !== 'AbortError') {
+                                    this.handleAudioError(error);
+                                }
+                            });
+                    }
                 }
+            } catch (error) {
+                this.handleAudioError(error);
             }
         }
 
@@ -353,6 +451,44 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.setVolume(this.lastVolume);
                 return true;
+            }
+        }
+
+        handleLoading(isLoading) {
+            clearTimeout(this.loadingTimeout);
+            
+            if (isLoading) {
+                this.loadingTimeout = setTimeout(() => {
+                    this.setLoadingState(true);
+                }, 500); // Add small delay to prevent flashing
+            } else {
+                this.setLoadingState(false);
+            }
+        }
+
+        handleAudioError(error) {
+            console.error('Audio Error:', error);
+            this.setLoadingState(false);
+            this.clearCurrentStream();
+            
+            if (this.activeButton) {
+                // Clear any existing error message
+                clearTimeout(this.errorTimeout);
+                const existingError = this.activeButton.parentNode.querySelector('.audio-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'audio-error';
+                errorMessage.textContent = 'Unable to play stream. Please try again.';
+                this.activeButton.parentNode.appendChild(errorMessage);
+
+                // Remove error message after 5 seconds
+                this.errorTimeout = setTimeout(() => {
+                    errorMessage.remove();
+                }, 5000);
             }
         }
     }
@@ -407,30 +543,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update close handlers
     function closeMobileNav() {
+        const mobileNav = document.querySelector('.mobile-nav');
+        const navMenu = document.querySelector('.nav-menu');
+        const body = document.body;
+        const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+
         if (mobileNav.classList.contains('active')) {
             mobileNav.classList.remove('active');
             navMenu.classList.remove('active');
             body.classList.remove('nav-active');
             body.style.top = '';
             body.style.touchAction = '';
-            window.scrollTo(0, scrollPosition);
             
-            // Remove touch event listeners
+            // Update toggle button icon
+            const icon = mobileNavToggle.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+            
+            // Remove event listeners
             document.removeEventListener('touchmove', preventScroll);
             document.removeEventListener('wheel', preventScroll);
             
-            mobileNavToggle.querySelector('i').classList.add('fa-bars');
-            mobileNavToggle.querySelector('i').classList.remove('fa-times');
+            // Restore scroll position
+            const scrollY = document.body.style.top;
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
         }
-        // Add this line to remove any leftover styles
-        document.body.style = ''; // Clear any inline styles
-        
-        // Restore scroll after a brief delay
-        setTimeout(() => {
-            window.scrollTo({
-                top: scrollPosition,
-                behavior: 'instant'
-            });
-        }, 100);
     }
 });
