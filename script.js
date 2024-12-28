@@ -105,6 +105,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Update the home link click handler
+    document.querySelectorAll('.mobile-nav a[href="/"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMobileNav(); // Close mobile nav first
+            setTimeout(() => { // Add small delay to ensure smooth transition
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 300);
+        });
+    });
+
     // Navigation active state handling
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
@@ -268,39 +282,52 @@ document.addEventListener('DOMContentLoaded', () => {
         togglePlayback(button) {
             if (!button?.dataset.stream) return;
 
-            // If same button is clicked while playing, just pause
+            // If same button is clicked while playing, just pause and return
             if (this.activeButton === button && this.isPlaying) {
                 this.pause();
                 return;
             }
 
-            // Clear any existing stream before starting new one
-            this.clearCurrentStream();
-
-            // Create new abort controller for this stream
-            this.currentLoadingController = new AbortController();
-            
-            // Show loading state immediately
-            this.setLoadingState(true);
-            this.activeButton = button;
-            
-            // Start new stream
-            const streamUrl = button.dataset.stream;
-            this.audio.src = streamUrl;
-            this.audio.load();
-            this.audio.play().then(() => {
-                this.isPlaying = true;
-                this.updateButtonState(button, true);
-            }).catch(error => {
-                if (error.name !== 'AbortError') {
-                    console.error('Playback failed:', error);
+            // If different button clicked or not playing
+            if (this.activeButton !== button || !this.isPlaying) {
+                // Clear any existing stream if switching to a new button
+                if (this.activeButton !== button) {
                     this.clearCurrentStream();
                 }
-            });
+
+                // Create new abort controller for this stream
+                this.currentLoadingController = new AbortController();
+                
+                // Show loading state immediately
+                this.setLoadingState(true);
+                this.activeButton = button;
+                
+                // Start new stream only if not already playing
+                if (!this.isPlaying) {
+                    const streamUrl = button.dataset.stream;
+                    this.audio.src = streamUrl;
+                    this.audio.load();
+                    this.audio.play().then(() => {
+                        this.isPlaying = true;
+                        this.updateButtonState(button, true);
+                    }).catch(error => {
+                        if (error.name !== 'AbortError') {
+                            console.error('Playback failed:', error);
+                            this.clearCurrentStream();
+                        }
+                    });
+                }
+            }
         }
 
         pause() {
-            this.clearCurrentStream();
+            if (this.audio) {
+                this.audio.pause();
+            }
+            if (this.activeButton) {
+                this.updateButtonState(this.activeButton, false);
+            }
+            this.isPlaying = false;
         }
 
         updateButtonState(button, playing) {
@@ -333,11 +360,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Audio Manager immediately
     const audioManager = new AudioBufferManager();
 
-    // Direct click handling without debounce
+    // Remove duplicate click handlers and keep only one
     document.querySelectorAll('[data-stream]').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            const currentScroll = window.scrollY;
             audioManager.togglePlayback(button);
+            window.scrollTo(0, currentScroll);
         });
     });
 
@@ -392,5 +422,15 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileNavToggle.querySelector('i').classList.add('fa-bars');
             mobileNavToggle.querySelector('i').classList.remove('fa-times');
         }
+        // Add this line to remove any leftover styles
+        document.body.style = ''; // Clear any inline styles
+        
+        // Restore scroll after a brief delay
+        setTimeout(() => {
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'instant'
+            });
+        }, 100);
     }
 });

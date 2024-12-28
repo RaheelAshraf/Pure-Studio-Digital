@@ -157,6 +157,8 @@ img {
   transition: all 0.3s ease;
   border: none;
   white-space: nowrap;
+  cursor: pointer; /* Add cursor pointer */
+  background-color: var(--primary); /* Ensure background color is set */
 }
 
 .listen-now-btn:hover {
