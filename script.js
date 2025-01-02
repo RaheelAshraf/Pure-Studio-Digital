@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             link.classList.remove('active');
             const href = link.getAttribute('href');
             // Check if we should highlight home link
-            if (hash === '' && (href === '/' || href === 'index.html')) {
+            if (hash === '' && (href === '/' || href === '/home')) {
                 link.classList.add('active');
             }
             // Check for section links
@@ -168,8 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (!href) return;
 
+                // If we're on terms.html, handle navigation differently
+                const isTermsPage = window.location.pathname.includes('terms.html');
+                if (isTermsPage && (href === '/home' || href === '/')) {
+                    window.location.href = href;
+                    return;
+                }
+
                 // Handle home link
-                if (href === '/' || href === 'index.html') {
+                if (href === '/' || href === '/home') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
