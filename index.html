@@ -24,9 +24,7 @@
     <link rel="apple-touch-icon" href="LogoPureSoul.webp">
     
     <!-- Preconnect for Audio Streams -->
-    <link rel="preconnect" href="https://ice5.somafm.com" crossorigin>
-    <link rel="preconnect" href="https://stream.zeno.fm" crossorigin>
-    <link rel="preconnect" href="https://stream4.rcast.net" crossorigin>
+    <!-- Stream domains will be dynamically added via JavaScript -->
     
     <!-- Meta Tags -->
     <meta name="description" content="PureSoul Digital - Your premier online radio station for soulful music">
@@ -110,7 +108,11 @@
                     <a href="#advertise-section" class="nav-link">Stations</a>
                     <a href="#contact" class="nav-link">Contact</a>
                 </nav>
-                <button class="listen-now-btn" id="navListenBtn" data-stream="https://s50.radiolize.com/radio/8130/radio.mp3">
+                <a href="https://www.amazon.com/gp/product/B0DS2L2MZX" target="_blank" class="get-app-btn">
+                    <i class="fab fa-amazon"></i>
+                    Get App
+                </a>
+                <button class="listen-now-btn" id="navListenBtn" data-station="MAIN_STREAM">
                     <i class="fas fa-play"></i>
                     Listen Live
                 </button>
@@ -155,7 +157,7 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="play-btn main-stream" data-stream="https://s50.radiolize.com/radio/8130/radio.mp3">
+                    <button class="play-btn main-stream" data-station="MAIN_STREAM">
                         <i class="fas fa-play"></i>
                         Start Listening
                     </button>
@@ -215,7 +217,7 @@
                         </div>
                         <p>Uplifting rhythms, faith-filled lyrics, spreading hope, love, and spiritual joy.</p>
                         <div class="station-actions">
-                            <button class="featured-btn play-btn" data-stream="https://stream3.rcast.net/72170">
+                            <button class="play-btn main-stream" data-station="GOSPEL_VIBES">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -238,7 +240,7 @@
                         </div>
                         <p>Smooth jazz and relaxing beats for your mind and soul.</p>
                         <div class="station-actions">
-                            <button class="featured-btn play-btn" data-stream="https://stream4.rcast.net/72057">
+                            <button class="play-btn main-stream" data-station="JAZZ_LOUNGE">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -261,7 +263,7 @@
                         </div>
                         <p>Raising awareness with strong messages while promoting peace and harmony.</p>
                         <div class="station-actions">
-                            <button class="featured-btn play-btn" data-stream="https://stream.zeno.fm/9yra7d8ederuv">
+                            <button class="play-btn main-stream" data-station="CONSCIOUS_REGGAE">
                                 <i class="fas fa-play"></i>
                                 Play Now
                             </button>
@@ -341,6 +343,28 @@
                     </div>
                 </div>
             </div>
+
+            <div class="contact-card">
+                <div class="card-content">
+                    <div class="contact-icon-wrapper">
+                        <div class="contact-icon">
+                            <i class="fab fa-amazon"></i>
+                        </div>
+                    </div>
+                    <div class="contact-info">
+                        <h3>Download Our App</h3>
+                        <div class="contact-details">
+                            <a href="https://www.amazon.com/gp/product/B0DS2L2MZX" target="_blank" class="contact-value app-link">Get it on Amazon App Store</a>
+                            <div class="contact-schedule">
+                                <span class="schedule-dot"></span>
+                                <span>Available Now</span>
+                                <span class="schedule-dot"></span>
+                                <span>Free Download</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="social-connect">
@@ -390,6 +414,10 @@
                         <li><a href="#advertise-section">Our Stations</a></li>
                         <li><a href="#contact">Contact Us</a></li>
                         <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="https://www.amazon.com/gp/product/B0DS2L2MZX" target="_blank" class="footer-app-link">
+                            <i class="fab fa-amazon"></i>
+                            Get App
+                        </a></li>
                     </ul>
                 </div>
             </div>

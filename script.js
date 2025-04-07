@@ -1,4 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Import radio stations
+    let RADIO_STATIONS;
+    try {
+        const module = await import('./stations.js');
+        RADIO_STATIONS = module.default;
+    } catch (error) {
+        console.error('Error loading radio stations:', error);
+        RADIO_STATIONS = {};
+    }
+    
     // Mobile Navigation Elements
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNav = document.querySelector('.mobile-nav');
@@ -265,12 +275,15 @@ document.addEventListener('DOMContentLoaded', () => {
     class AudioBufferManager {
         constructor() {
             this.audio = new Audio();
-            this.audio.preload = "none"; // Start with no preload
+            this.audio.preload = "auto";
             this.audio.crossOrigin = "anonymous";
             this.isPlaying = false;
             this.activeButton = null;
             this.lastVolume = 80;
             this.isLoading = false;
+            this.currentStation = null;
+            this.streamBuffers = new Map();
+            this._hasRetried = false;
 
             // Set volume immediately
             this.audio.volume = this.lastVolume / 100;
@@ -280,21 +293,48 @@ document.addEventListener('DOMContentLoaded', () => {
             this.audio.addEventListener('playing', () => this.setLoadingState(false));
             this.audio.addEventListener('error', () => this.setLoadingState(false));
 
-            // Pre-initialize streams
-            document.querySelectorAll('[data-stream]').forEach(button => {
-                const stream = button.dataset.stream;
-                if (stream) {
-                    const preloadLink = document.createElement('link');
-                    preloadLink.rel = 'preconnect';
-                    preloadLink.href = new URL(stream).origin;
-                    document.head.appendChild(preloadLink);
+            // Pre-initialize streams and add preconnect links
+            const streamingDomains = new Set();
+            const streamUrls = [];
+            
+            // Process all station buttons
+            document.querySelectorAll('[data-station]').forEach(button => {
+                const stationKey = button.dataset.station;
+                if (stationKey && RADIO_STATIONS[stationKey]) {
+                    const streamUrl = RADIO_STATIONS[stationKey];
+                    try {
+                        const url = new URL(streamUrl);
+                        streamingDomains.add(url.origin);
+                        streamUrls.push(streamUrl);
+                    } catch (e) {
+                        console.error('Invalid stream URL for station:', stationKey, e);
+                    }
                 }
             });
 
+            // Add preconnect links for all streaming domains with high priority
+            streamingDomains.forEach(domain => {
+                const preloadLink = document.createElement('link');
+                preloadLink.rel = 'preconnect';
+                preloadLink.href = domain;
+                preloadLink.crossOrigin = 'anonymous';
+                document.head.appendChild(preloadLink);
+                
+                // Add DNS prefetch for faster resolution
+                const dnsPrefetch = document.createElement('link');
+                dnsPrefetch.rel = 'dns-prefetch';
+                dnsPrefetch.href = domain;
+                document.head.appendChild(dnsPrefetch);
+            });
+
+            // Preload audio stream metadata for faster switching
+            this.preloadStreamMetadata(streamUrls);
+            
+            // Preload buffer samples for each stream
+            this.preloadStreamBuffers(streamUrls);
+
             // Add abort controller for loading states
             this.currentLoadingController = null;
-
-            // Add error handling and loading states
             this.errorTimeout = null;
             this.loadingTimeout = null;
             
@@ -315,20 +355,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.handleLoading(false);
             });
 
+            // Reduce latency with low latency mode
+            if (this.audio.mozAutoplayEnabled !== undefined) {
+                this.audio.mozAutoplayEnabled = true;
+            }
+            
             // Add interaction observer
             this.setupInteractionObserver();
         }
 
+        preloadStreamMetadata(streamUrls) {
+            // Preload stream metadata without actually downloading the full content
+            streamUrls.forEach(url => {
+                fetch(url, { method: 'HEAD', mode: 'no-cors' })
+                    .catch(e => console.log('Preload fetch:', e));
+            });
+        }
+
         setupInteractionObserver() {
-            // Enable preloading after first user interaction
             const enablePreload = () => {
                 this.audio.preload = "auto";
                 document.removeEventListener('click', enablePreload);
                 document.removeEventListener('touchstart', enablePreload);
+                
+                // Pre-warm connection for main stream
+                const mainStreamButton = document.querySelector('[data-station="MAIN_STREAM"]');
+                if (mainStreamButton && RADIO_STATIONS.MAIN_STREAM) {
+                    this.prewarmStream(RADIO_STATIONS.MAIN_STREAM);
+                }
             };
 
             document.addEventListener('click', enablePreload, { once: true });
             document.addEventListener('touchstart', enablePreload, { once: true });
+        }
+
+        prewarmStream(streamUrl) {
+            // Create a temporary audio element to preload stream
+            const tempAudio = new Audio();
+            tempAudio.preload = "auto";
+            tempAudio.src = streamUrl;
+            tempAudio.load();
+            
+            // Just load the initial metadata
+            setTimeout(() => {
+                tempAudio.pause();
+                tempAudio.src = '';
+            }, 500);
         }
 
         clearCurrentStream() {
@@ -353,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.isPlaying = false;
             this.activeButton = null;
+            this.currentStation = null;
         }
 
         setLoadingState(isLoading) {
@@ -381,60 +454,117 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         togglePlayback(button) {
-            if (!button?.dataset.stream) return;
-
+            if (!button?.dataset.station) return;
+            
             try {
-                // Enable preload when user attempts playback
-                this.audio.preload = "auto";
+                const stationKey = button.dataset.station;
+                const streamUrl = RADIO_STATIONS[stationKey];
                 
-                // If same button is clicked while playing, just pause and return
-                if (this.activeButton === button && this.isPlaying) {
+                if (!streamUrl) {
+                    console.error('No URL found for station:', stationKey);
+                    return;
+                }
+                
+                // If same station is already playing, just pause
+                if (this.currentStation === stationKey && this.isPlaying) {
                     this.pause();
                     return;
                 }
 
-                // If different button clicked or not playing
-                if (this.activeButton !== button || !this.isPlaying) {
-                    // Clear any existing stream if switching to a new button
-                    if (this.activeButton !== button) {
-                        this.clearCurrentStream();
+                // Special handling for rcast.net streams
+                const isRcastStream = streamUrl.includes('rcast.net');
+                
+                // Warm up the stream before switching to reduce lag
+                this.prewarmStream(streamUrl);
+
+                // Clear any existing stream before starting a new one
+                this.clearCurrentStream();
+
+                // Set up new stream
+                this.activeButton = button;
+                this.currentStation = stationKey;
+                this.currentLoadingController = new AbortController();
+                
+                // Show loading state immediately
+                this.setLoadingState(true);
+                
+                // Set new audio source with optimized settings
+                this.audio.src = streamUrl;
+                
+                // Set low latency mode if available
+                try {
+                    if (this.audio.mozPreservesPitch !== undefined) {
+                        this.audio.mozPreservesPitch = false;
                     }
-
-                    // Create new abort controller for this stream
-                    this.currentLoadingController = new AbortController();
-                    
-                    // Show loading state immediately
-                    this.handleLoading(true);
-                    this.activeButton = button;
-                    
-                    // Start new stream only if not already playing
-                    if (!this.isPlaying) {
-                        const streamUrl = button.dataset.stream;
-                        this.audio.src = streamUrl;
-                        this.audio.load();
-
-                        // Add timeout for slow connections
-                        const playbackTimeout = setTimeout(() => {
-                            if (this.isLoading) {
-                                this.handleAudioError(new Error('Playback timeout'));
-                            }
-                        }, 10000); // 10 second timeout
-
-                        this.audio.play()
-                            .then(() => {
-                                clearTimeout(playbackTimeout);
-                                this.isPlaying = true;
-                                this.updateButtonState(button, true);
-                            })
-                            .catch(error => {
-                                clearTimeout(playbackTimeout);
-                                if (error.name !== 'AbortError') {
-                                    this.handleAudioError(error);
-                                }
-                            });
+                    if (this.audio.preservesPitch !== undefined) {
+                        this.audio.preservesPitch = false;
                     }
+                    
+                    // Special handling for rcast.net streams
+                    if (isRcastStream) {
+                        // Force CORS mode for rcast streams
+                        this.audio.crossOrigin = "anonymous";
+                        // Add cache buster to URL to avoid caching issues
+                        if (!streamUrl.includes('?')) {
+                            this.audio.src = streamUrl + '?_=' + new Date().getTime();
+                        }
+                    }
+                } catch (e) {
+                    console.log('Advanced audio settings not supported');
                 }
+                
+                // Load with high priority
+                this.audio.load();
+
+                // Add shorter timeout for rcast streams
+                const playbackTimeout = setTimeout(() => {
+                    if (this.isLoading) {
+                        this.handleAudioError(new Error('Playback timeout'));
+                    }
+                }, isRcastStream ? 6000 : 8000); // Shorter timeout for rcast streams
+
+                // Attempt to play the stream with low latency
+                this.audio.play()
+                    .then(() => {
+                        clearTimeout(playbackTimeout);
+                        this.isPlaying = true;
+                        this.updateButtonState(button, true);
+                        this.setLoadingState(false);
+                    })
+                    .catch(error => {
+                        clearTimeout(playbackTimeout);
+                        if (error.name !== 'AbortError') {
+                            console.error('Playback error:', error);
+                            
+                            // Special retry for rcast streams
+                            if (isRcastStream && !this._hasRetried) {
+                                this._hasRetried = true;
+                                console.log('Retrying rcast stream with different approach');
+                                
+                                // Try with a different approach for rcast streams
+                                setTimeout(() => {
+                                    this.audio.src = streamUrl + '?_=' + new Date().getTime();
+                                    this.audio.load();
+                                    this.audio.play()
+                                        .then(() => {
+                                            this.isPlaying = true;
+                                            this.updateButtonState(button, true);
+                                            this.setLoadingState(false);
+                                            this._hasRetried = false;
+                                        })
+                                        .catch(e => {
+                                            this._hasRetried = false;
+                                            this.handleAudioError(e);
+                                        });
+                                }, 500);
+                            } else {
+                                this._hasRetried = false;
+                                this.handleAudioError(error);
+                            }
+                        }
+                    });
             } catch (error) {
+                console.error('Toggle playback error:', error);
                 this.handleAudioError(error);
             }
         }
@@ -476,15 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         handleLoading(isLoading) {
-            clearTimeout(this.loadingTimeout);
-            
-            if (isLoading) {
-                this.loadingTimeout = setTimeout(() => {
-                    this.setLoadingState(true);
-                }, 500); // Add small delay to prevent flashing
-            } else {
-                this.setLoadingState(false);
-            }
+            this.isLoading = isLoading;
+            this.setLoadingState(isLoading);
         }
 
         handleAudioError(error) {
@@ -512,13 +635,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 5000);
             }
         }
+
+        preloadStreamBuffers(streamUrls) {
+            // Create audio contexts for each stream to warm up the connection
+            if (window.AudioContext || window.webkitAudioContext) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                
+                // Preload the first second of each stream to memory for instant playback
+                streamUrls.forEach(url => {
+                    if (url.includes('rcast.net')) {
+                        // Add a timestamp to avoid caching
+                        const cacheBuster = url.includes('?') ? '&_=' : '?_=';
+                        const bufferedUrl = url + cacheBuster + new Date().getTime();
+                        
+                        try {
+                            // Create temporary audio element to preload buffer
+                            const tempAudio = new Audio();
+                            tempAudio.crossOrigin = "anonymous";
+                            tempAudio.preload = "auto";
+                            tempAudio.src = bufferedUrl;
+                            
+                            // Just trigger loading but don't actually play
+                            tempAudio.load();
+                            
+                            // Store reference to later cleanup
+                            this.streamBuffers.set(url, tempAudio);
+                            
+                            // Cleanup after 2 seconds
+                            setTimeout(() => {
+                                tempAudio.src = '';
+                                tempAudio.load();
+                            }, 2000);
+                        } catch (e) {
+                            console.log('Error preloading buffer:', e);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     // Initialize Audio Manager immediately
     const audioManager = new AudioBufferManager();
 
     // Remove duplicate click handlers and keep only one
-    document.querySelectorAll('[data-stream]').forEach(button => {
+    document.querySelectorAll('[data-station]').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
